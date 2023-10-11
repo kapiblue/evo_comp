@@ -4,13 +4,14 @@
 #include <sstream>
 #include <vector>
 #include <tuple>
+#include<cmath> // power and sqrt
 
 using namespace std;
 
 class DistanceMatrixCreator
 {
 private:
-    vector<vector<int>> distance_matrix;
+    vector<vector<int> > distance_matrix;
 
 public:
     void read_coordinates(string filename, vector<int> *xs,
@@ -69,7 +70,16 @@ public:
         }
     }
 
-    vector<vector<int>> get_distance_matrix()
+    double euclidean_distance(int x1, int y1, int x2, int y2){
+
+        double euc_dist;
+        euc_dist = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+
+        return euc_dist;
+
+    }
+
+    vector<vector<int> > get_distance_matrix()
     {
         return distance_matrix;
     }
@@ -82,8 +92,14 @@ int main()
 
     dmc.create("TSPA.csv");
 
-    vector<vector<int>> dm;
+    vector<vector<int> > dm;
     dm = dmc.get_distance_matrix();
+
+    double ed;
+    ed = dmc.euclidean_distance(1, 1, 3, 3);
+
+    cout << ed << endl;
+    cout << round(ed) << endl;
 
     return 0;
 }
