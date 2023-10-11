@@ -41,6 +41,7 @@ void read_csv(string filename,
 
         while (getline(s, word, ';'))
         {
+            // Collect items separated by delimiter
             row.push_back(word);
         }
         (*rows).push_back(row);

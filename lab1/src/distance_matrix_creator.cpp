@@ -35,21 +35,19 @@ void DistanceMatrixCreator::read_coordinates(std::string filename,
 
 void DistanceMatrixCreator::create(string filename)
 {
+    // For storing xs, ys, and costs
     vector<int> xs, ys, costs;
 
     read_coordinates(filename, &xs, &ys, &costs);
-
-    for (int x : xs)
-    {
-        cout << x << endl;
-    }
 
     for (int i = 0; i < xs.size(); i++)
     {
         vector<int> temp;
         for (int j = 0; j < xs.size(); j++)
         {
+            // Calculate Euclidean Distance
             double ed = euclidean_distance(xs[i], ys[i], xs[j], ys[j]);
+            // Store the rounded value
             temp.push_back(round(ed));
         }
         distance_matrix.push_back(temp);
@@ -59,6 +57,7 @@ void DistanceMatrixCreator::create(string filename)
 double DistanceMatrixCreator::euclidean_distance(int x1, int y1, int x2, int y2)
 {
     double euc_dist;
+    // Calculate Euclidean Distance between (x1, y1) and (x2, y2)
     euc_dist = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 
     return euc_dist;
@@ -68,6 +67,7 @@ vector<vector<int>> DistanceMatrixCreator::get_distance_matrix() { return distan
 
 void DistanceMatrixCreator::print_distance_matrix()
 {
+    // Print the Distance Matrix
     for (int i = 0; i < distance_matrix.size(); ++i)
     {
         for (int j = 0; j < distance_matrix[i].size(); ++j)
