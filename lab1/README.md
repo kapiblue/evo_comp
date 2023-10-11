@@ -34,3 +34,16 @@ value of the objective function.
 presented e.g. by a color, greyscale, or size.
 * (link to) source code
 * Conclusions
+
+### Compilation instructions
+
+Open terminal in the /src directory and run the command:
+```
+g++ *.cpp --std=c++17 -o my_program
+```
+
+In order to run the file:
+```
+./my_program  
+```
+
