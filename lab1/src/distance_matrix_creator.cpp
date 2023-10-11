@@ -13,8 +13,7 @@ using namespace N;
 
 void DistanceMatrixCreator::read_coordinates(std::string filename,
                                              vector<int> *xs,
-                                             vector<int> *ys,
-                                             vector<int> *costs)
+                                             vector<int> *ys)
 {
 
     vector<vector<string>> rows;
@@ -28,7 +27,7 @@ void DistanceMatrixCreator::read_coordinates(std::string filename,
         {
             (*xs).push_back(stoi(rows[i][0]));
             (*ys).push_back(stoi(rows[i][1]));
-            (*costs).push_back(stoi(rows[i][2]));
+            costs.push_back(stoi(rows[i][2]));
         }
     }
 }
@@ -36,9 +35,9 @@ void DistanceMatrixCreator::read_coordinates(std::string filename,
 void DistanceMatrixCreator::create(string filename)
 {
     // For storing xs, ys, and costs
-    vector<int> xs, ys, costs;
+    vector<int> xs, ys;
 
-    read_coordinates(filename, &xs, &ys, &costs);
+    read_coordinates(filename, &xs, &ys);
 
     for (int i = 0; i < xs.size(); i++)
     {
@@ -64,6 +63,7 @@ double DistanceMatrixCreator::euclidean_distance(int x1, int y1, int x2, int y2)
 }
 
 vector<vector<int>> DistanceMatrixCreator::get_distance_matrix() { return distance_matrix; }
+std::vector<int> DistanceMatrixCreator::get_costs() {return costs; }
 
 void DistanceMatrixCreator::print_distance_matrix()
 {
