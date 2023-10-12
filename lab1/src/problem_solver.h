@@ -17,7 +17,7 @@ namespace N
         int n_nodes;
 
     public:
-        ProblemSolver(std::string instance_filename, int n_nodes);
+        ProblemSolver(std::string instance_filename, double fraction_nodes);
         void generate_solutions(std::string method);
         int random_solution_score(int total_nodes, int n_nodes);
         void print_solution_stats(std::vector<int>* evaluations);

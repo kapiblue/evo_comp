@@ -13,7 +13,7 @@
 using namespace std;
 using namespace N;
 
-ProblemSolver::ProblemSolver(string instance_filename, int n_nodes)
+ProblemSolver::ProblemSolver(string instance_filename, double fraction_nodes)
 {
     // Class init
 
@@ -29,7 +29,7 @@ ProblemSolver::ProblemSolver(string instance_filename, int n_nodes)
 
     // n_nodes specifies how many nodes
     // should be covered in the solotion
-    this->n_nodes = n_nodes;
+    this->n_nodes = int(this->total_nodes * fraction_nodes);
 
     cout << instance_filename << endl;
 }
