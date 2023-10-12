@@ -7,6 +7,8 @@
 #include <iostream>
 #include <algorithm>
 #include <typeinfo>
+#include <random>
+#include <time.h>
 
 using namespace std;
 using namespace N;
@@ -22,6 +24,8 @@ ProblemSolver::ProblemSolver(string instance_filename, int n_nodes)
     this->dist_mat = dmc.get_distance_matrix();
     this->costs = dmc.get_costs();
     this->total_nodes = this->costs.size();
+
+    srand(time(NULL));
 
     // n_nodes specifies how many nodes
     // should be covered in the solotion
@@ -78,7 +82,7 @@ int ProblemSolver::random_solution_score(int total_nodes, int n_nodes)
     rand_sol.generate(total_nodes, n_nodes);
 
     // Evaluate solution
-    temp_eval = rand_sol.evaluate(&this->costs);
+    temp_eval = rand_sol.evaluate(&this->dist_mat, &this->costs);
 
     return temp_eval;
 }

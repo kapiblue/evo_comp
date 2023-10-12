@@ -4,7 +4,6 @@
 #include <string>
 #include <fstream>
 
-
 using namespace std;
 using namespace N;
 
@@ -19,20 +18,37 @@ vector<int> Solution::get_nodes()
     return this->nodes;
 }
 
-int Solution::get_number_of_nodes(){
+int Solution::get_number_of_nodes()
+{
     return this->nodes.size();
 }
 
-int Solution::evaluate(vector<int> *costs)
+int Solution::evaluate(vector<vector<int>> *dist_mat, vector<int> *costs)
 {
 
-    int total_cost;
-    int temp_cost;
+    int temp_node_cost, temp_dist;
 
-    for (int i = 0; i < this->nodes.size(); i++)
+    int current = this->nodes[0];
+    // Init total cost as the cost
+    // of the first node
+    int total_cost = (*costs)[current];
+
+    // To track the next node
+    int next;
+
+    for (int i = 1; i < this->nodes.size(); i++)
     {
-        temp_cost = (*costs)[this->nodes[i]];
-        total_cost += temp_cost;
+        next = this->nodes[i];
+
+        // Add node cost
+        temp_node_cost = (*costs)[next];
+        total_cost += temp_node_cost;
+
+        // Add distance cost
+        temp_dist = (*dist_mat)[current][next];
+        total_cost += temp_dist;
+
+        current = next;
     }
 
     return total_cost;
@@ -47,7 +63,8 @@ void Solution::print()
     }
 }
 
-void Solution::write_to_csv(string filename){
+void Solution::write_to_csv(string filename)
+{
 
     ofstream myfile;
     myfile.open(filename);

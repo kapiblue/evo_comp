@@ -16,7 +16,7 @@ void RandomSolution::generate(int total_nodes, int n_nodes)
 
     while (nodes.size() < n_nodes)
     {
-        node_id = rand() % (total_nodes + 1);
+        node_id = rand() % total_nodes;
 
         if (!nodes.count(node_id))
         {

@@ -17,7 +17,7 @@ namespace N
         void add_node(int node);
         std::vector<int> get_nodes();
         int get_number_of_nodes();
-        int evaluate(std::vector<int>* costs);
+        int evaluate(std::vector<std::vector<int>>* dist_mat, std::vector<int> *costs);
         void print();
         void write_to_csv(std::string filename);
     };
