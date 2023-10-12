@@ -9,7 +9,8 @@ using namespace N;
 
 void RandomSolution::generate(int total_nodes, int n_nodes)
 {
-    // Count how many nodes are in the solution
+    // Tempoary storage to check
+    // if a node was already in the solution
     set<int> nodes;
     int node_id;
 

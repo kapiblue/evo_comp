@@ -31,7 +31,7 @@ int Solution::evaluate(vector<int> *costs)
 
     for (int i = 0; i < this->nodes.size(); i++)
     {
-        temp_cost = (*costs)[nodes[i]];
+        temp_cost = (*costs)[this->nodes[i]];
         total_cost += temp_cost;
     }
 
