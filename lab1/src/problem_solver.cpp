@@ -30,9 +30,8 @@ ProblemSolver::ProblemSolver(string instance_filename, int n_nodes)
     cout << instance_filename << endl;
 }
 
-void ProblemSolver::generate_random_solutions()
+void ProblemSolver::generate_solutions(string method)
 {
-    cout << this->total_nodes << endl;
 
     // For temporal storage of solution scores
     std::vector<int> evaluations;
@@ -42,22 +41,46 @@ void ProblemSolver::generate_random_solutions()
 
     for (int i = 0; i < this->total_nodes; i++)
     {
-        // Create new random solution
-        RandomSolution rand_sol;
 
-        // Generate new solution
-        rand_sol.generate(total_nodes, n_nodes);
+        if (method == "RANDOM")
+        {
+            temp_eval = random_solution_score(this->total_nodes, this->n_nodes);
+        }
 
-        // Evaluate solution
-        temp_eval = rand_sol.evaluate(&this->costs);
+        if (method == "NEAREST_NEIGHBOR")
+        {
+            temp_eval = -1; // ;)
+        }
 
+        if (method == "GREEDY_CYCLE")
+        {
+            temp_eval = -111; // ;)
+        }
 
         evaluations.push_back(temp_eval);
     }
 
-    cout << "RANDOM" << endl;
+    cout << method << endl;
 
     print_solution_stats(&evaluations);
+}
+
+int ProblemSolver::random_solution_score(int total_nodes, int n_nodes)
+{
+
+    // For temporal storage
+    int temp_eval;
+
+    // Create new random solution
+    RandomSolution rand_sol;
+
+    // Generate new solution
+    rand_sol.generate(total_nodes, n_nodes);
+
+    // Evaluate solution
+    temp_eval = rand_sol.evaluate(&this->costs);
+
+    return temp_eval;
 }
 
 void ProblemSolver::print_solution_stats(std::vector<int> *evaluations)

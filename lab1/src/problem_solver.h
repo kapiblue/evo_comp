@@ -18,7 +18,8 @@ namespace N
 
     public:
         ProblemSolver(std::string instance_filename, int n_nodes);
-        void generate_random_solutions();
+        void generate_solutions(std::string method);
+        int random_solution_score(int total_nodes, int n_nodes);
         void print_solution_stats(std::vector<int>* evaluations);
     };
 

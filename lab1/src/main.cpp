@@ -10,7 +10,7 @@ int main()
 {
     ProblemSolver ps = ProblemSolver("../TSPA.csv", 100);
 
-    ps.generate_random_solutions();
+    ps.generate_solutions("RANDOM");
 
     return 0;
 }
