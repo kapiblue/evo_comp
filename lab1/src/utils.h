@@ -9,6 +9,8 @@ void read_csv(std::string filename,
               char delimiter,
               std::vector<std::vector<std::string>> *rows);
 
+double euclidean_distance(int x1, int y1, int x2, int y2);
+
 template <typename T>
 double mean(std::vector<T> vec)
 {

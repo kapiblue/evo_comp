@@ -53,15 +53,6 @@ void DistanceMatrixCreator::create(string filename)
     }
 }
 
-double DistanceMatrixCreator::euclidean_distance(int x1, int y1, int x2, int y2)
-{
-    double euc_dist;
-    // Calculate Euclidean Distance between (x1, y1) and (x2, y2)
-    euc_dist = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
-
-    return euc_dist;
-}
-
 vector<vector<int>> DistanceMatrixCreator::get_distance_matrix() { return distance_matrix; }
 std::vector<int> DistanceMatrixCreator::get_costs() {return costs; }
 
