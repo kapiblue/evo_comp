@@ -13,6 +13,12 @@ void Solution::add_node(int node)
     this->nodes.push_back(node);
 }
 
+void Solution::set_nodes(vector<int> nodes)
+{
+    // Set nodes
+    this->nodes = nodes;
+}
+
 vector<int> Solution::get_nodes()
 {
     return this->nodes;
@@ -59,8 +65,9 @@ void Solution::print()
 
     for (int i = 0; i < this->nodes.size(); i++)
     {
-        cout << this->nodes[i] << endl;
+        cout << this->nodes[i] << " ";
     }
+    cout << endl;
 }
 
 void Solution::write_to_csv(string filename)

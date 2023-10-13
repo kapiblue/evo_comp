@@ -12,6 +12,16 @@ void read_csv(std::string filename,
 double euclidean_distance(int x1, int y1, int x2, int y2);
 
 template <typename T>
+T contain(std::vector<T> vec, T value){
+    for(int i=0; i<vec.size(); i++){
+        if(vec[i] == value){
+            return true;
+        }
+    }
+    return false;
+}
+
+template <typename T>
 double mean(std::vector<T> vec)
 {
 

@@ -2,6 +2,8 @@
 #include "distance_matrix_creator.h"
 #include "solution.h"
 #include "random_solution.h"
+#include "nearest_neighbor.h"
+#include "greedy_cycle.h"
 #include "utils.h"
 
 #include <iostream>
@@ -53,12 +55,12 @@ void ProblemSolver::generate_solutions(string method)
 
         if (method == "NEAREST_NEIGHBOR")
         {
-            temp_eval = -1; // ;)
+            temp_eval = nearest_neighbor_solution_score(this->n_nodes, i);
         }
 
         if (method == "GREEDY_CYCLE")
         {
-            temp_eval = -111; // ;)
+            temp_eval = greedy_cycle_solution_score(this->n_nodes, i);
         }
 
         evaluations.push_back(temp_eval);
@@ -83,6 +85,42 @@ int ProblemSolver::random_solution_score(int total_nodes, int n_nodes)
 
     // Evaluate solution
     temp_eval = rand_sol.evaluate(&this->dist_mat, &this->costs);
+
+    return temp_eval;
+}
+
+int ProblemSolver::nearest_neighbor_solution_score(int n_nodes, int start_node)
+{
+
+    // For temporal storage
+    int temp_eval;
+
+    // Create new random solution
+    NearestNeighbor nearest_neighbor_sol;
+
+    // Generate new solution
+    nearest_neighbor_sol.generate(this->dist_mat, this->costs, start_node, n_nodes);
+
+    // Evaluate solution
+    temp_eval = nearest_neighbor_sol.evaluate(&this->dist_mat, &this->costs);
+
+    return temp_eval;
+}
+
+int ProblemSolver::greedy_cycle_solution_score(int n_nodes, int start_node)
+{
+
+    // For temporal storage
+    int temp_eval;
+
+    // Create new random solution
+    GreedyCycle greedy_cycle_sol;
+
+    // Generate new solution
+    greedy_cycle_sol.generate(this->dist_mat, this->costs, start_node, n_nodes);
+
+    // Evaluate solution
+    temp_eval = greedy_cycle_sol.evaluate(&this->dist_mat, &this->costs);
 
     return temp_eval;
 }

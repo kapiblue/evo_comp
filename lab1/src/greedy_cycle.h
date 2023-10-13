@@ -2,13 +2,13 @@
 
 #include "solution.h"
 
-#ifndef _NEARESTNEIGHBOR_H
-#define _NEARESTNEIGHBOR_H
+#ifndef _GREEDYCYCLE_H
+#define _GREEDYCYCLE_H
 
 namespace N
 {
 
-    class NearestNeighbor : public Solution
+    class GreedyCycle : public Solution
     {
 
     public:

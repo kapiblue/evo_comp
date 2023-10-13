@@ -15,6 +15,7 @@ namespace N
 
     public:
         void add_node(int node);
+        void set_nodes(std::vector<int> nodes);
         std::vector<int> get_nodes();
         int get_number_of_nodes();
         int evaluate(std::vector<std::vector<int>>* dist_mat, std::vector<int> *costs);

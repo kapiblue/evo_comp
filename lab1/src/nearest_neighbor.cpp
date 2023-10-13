@@ -1,4 +1,5 @@
 #include "nearest_neighbor.h"
+#include "utils.h"
 
 #include <iostream>
 #include <algorithm>
@@ -22,15 +23,6 @@ void NearestNeighbor::generate(vector<vector<int>> dist_mat, vector<int> costs, 
     }
 }
 
-bool NearestNeighbor::contain(vector<int> vec, int value){
-    for(int i=0; i<vec.size(); i++){
-        if(vec[i] == value){
-            return true;
-        }
-    }
-    return false;
-}
-
 int NearestNeighbor::most_beneficial_node(vector<int> all_distances, vector<int> all_costs, vector<int> excluded_nodes){
     
     int min_idx = -1;
@@ -39,7 +31,7 @@ int NearestNeighbor::most_beneficial_node(vector<int> all_distances, vector<int>
     for(int i=0; i<all_distances.size(); i++){
         if(!contain(excluded_nodes, i)){
 
-            int tmp_total_cost = all_distances[i] + all_costs[i];
+            int tmp_total_cost = all_distances[i]+ all_costs[i];
             if(tmp_total_cost < min_total_cost){
                 min_idx = i;
                 min_total_cost = tmp_total_cost;
