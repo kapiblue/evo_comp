@@ -27,22 +27,31 @@ ProblemSolver::ProblemSolver(string instance_filename, double fraction_nodes)
     this->costs = dmc.get_costs();
     this->total_nodes = this->costs.size();
 
+    // Extract instance name
+    string delimiter = "/";
+    string token = instance_filename.substr(instance_filename.find(delimiter) + 1); 
+    delimiter = ".";
+    token = token.substr(0, token.find(delimiter)); 
+    this->instance_name = token;
+
     srand(time(NULL));
 
     // n_nodes specifies how many nodes
     // should be covered in the solotion
     this->n_nodes = int(this->total_nodes * fraction_nodes);
 
-    cout << instance_filename << endl;
+    cout << instance_name << endl;
 }
 
 void ProblemSolver::generate_solutions(string method)
 {
 
     // For temporal storage of solution scores
+    std::vector<Solution *> solutions;
     std::vector<int> evaluations;
 
     // For temporal storage of a single score
+    Solution * temp_sol;
     int temp_eval;
 
     for (int i = 0; i < this->total_nodes; i++)
@@ -50,80 +59,109 @@ void ProblemSolver::generate_solutions(string method)
 
         if (method == "RANDOM")
         {
-            temp_eval = random_solution_score(this->total_nodes, this->n_nodes);
+            temp_sol = random_solution(this->total_nodes, this->n_nodes);
+            temp_eval = random_solution_score(temp_sol);
         }
 
         if (method == "NEAREST_NEIGHBOR")
         {
-            temp_eval = nearest_neighbor_solution_score(this->n_nodes, i);
+            temp_sol = nearest_neighbor_solution(this->n_nodes, i);
+            temp_eval = nearest_neighbor_solution_score(temp_sol);
         }
 
         if (method == "GREEDY_CYCLE")
         {
-            temp_eval = greedy_cycle_solution_score(this->n_nodes, i);
+            temp_sol = greedy_cycle_solution(this->n_nodes, i);
+            temp_eval = greedy_cycle_solution_score(temp_sol);
         }
 
+        solutions.push_back(temp_sol);
         evaluations.push_back(temp_eval);
     }
+    // Get best solution index
+    vector<int>::iterator it = min_element(begin(evaluations), end(evaluations));
+    int best_sol_idx = distance(begin(evaluations), it);
+    temp_sol = solutions[best_sol_idx];
+    // Export best solution
+    string filename = "../solutions/" + this->instance_name + "/" + method + ".csv";
+    temp_sol->write_to_csv(filename);
 
     cout << method << endl;
-
     print_solution_stats(&evaluations);
 }
 
-int ProblemSolver::random_solution_score(int total_nodes, int n_nodes)
-{
 
+RandomSolution * ProblemSolver::random_solution(int total_nodes, int n_nodes)
+{
+    // Create new random solution
+    RandomSolution * rand_sol = new RandomSolution();
+
+    // Generate new solution
+    rand_sol->generate(total_nodes, n_nodes);
+
+    // return temp_eval;
+    return rand_sol;
+}
+
+int ProblemSolver::random_solution_score(Solution * rand_sol)
+{
     // For temporal storage
     int temp_eval;
 
-    // Create new random solution
-    RandomSolution rand_sol;
-
-    // Generate new solution
-    rand_sol.generate(total_nodes, n_nodes);
-
     // Evaluate solution
-    temp_eval = rand_sol.evaluate(&this->dist_mat, &this->costs);
+    temp_eval = rand_sol->evaluate(&this->dist_mat, &this->costs);
 
     return temp_eval;
 }
 
-int ProblemSolver::nearest_neighbor_solution_score(int n_nodes, int start_node)
-{
 
+NearestNeighbor * ProblemSolver::nearest_neighbor_solution(int n_nodes, int start_node)
+{
+    // Create new random solution
+    NearestNeighbor * nearest_neighbor_sol = new NearestNeighbor();
+
+    // Generate new solution
+    nearest_neighbor_sol->generate(this->dist_mat, this->costs, start_node, n_nodes);
+
+    // return temp_eval;
+    return nearest_neighbor_sol;
+}
+
+int ProblemSolver::nearest_neighbor_solution_score(Solution * nearest_neighbor_sol)
+{
     // For temporal storage
     int temp_eval;
 
-    // Create new random solution
-    NearestNeighbor nearest_neighbor_sol;
-
-    // Generate new solution
-    nearest_neighbor_sol.generate(this->dist_mat, this->costs, start_node, n_nodes);
-
     // Evaluate solution
-    temp_eval = nearest_neighbor_sol.evaluate(&this->dist_mat, &this->costs);
+    temp_eval = nearest_neighbor_sol->evaluate(&this->dist_mat, &this->costs);
 
     return temp_eval;
 }
 
-int ProblemSolver::greedy_cycle_solution_score(int n_nodes, int start_node)
-{
 
+GreedyCycle * ProblemSolver::greedy_cycle_solution(int n_nodes, int start_node)
+{
+    // Create new random solution
+    GreedyCycle * greedy_cycle_sol = new GreedyCycle();
+
+    // Generate new solution
+    greedy_cycle_sol->generate(this->dist_mat, this->costs, start_node, n_nodes);
+
+    // return temp_eval;
+    return greedy_cycle_sol;
+}
+
+int ProblemSolver::greedy_cycle_solution_score(Solution * greedy_cycle_sol)
+{
     // For temporal storage
     int temp_eval;
 
-    // Create new random solution
-    GreedyCycle greedy_cycle_sol;
-
-    // Generate new solution
-    greedy_cycle_sol.generate(this->dist_mat, this->costs, start_node, n_nodes);
-
     // Evaluate solution
-    temp_eval = greedy_cycle_sol.evaluate(&this->dist_mat, &this->costs);
+    temp_eval = greedy_cycle_sol->evaluate(&this->dist_mat, &this->costs);
 
     return temp_eval;
 }
+
 
 void ProblemSolver::print_solution_stats(std::vector<int> *evaluations)
 {

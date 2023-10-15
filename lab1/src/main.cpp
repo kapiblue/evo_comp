@@ -20,7 +20,9 @@ int main()
     for (auto instance_filename : instances)
     {
         ProblemSolver ps = ProblemSolver(instance_filename, 0.5);
-        ps.generate_solutions("NEAREST_NEIGHBOR");
+        // ps.generate_solutions("RANDOM");
+        // ps.generate_solutions("NEAREST_NEIGHBOR");
+        ps.generate_solutions("GREEDY_CYCLE");
     }
 
     return 0;
