@@ -57,6 +57,8 @@ int Solution::evaluate(vector<vector<int>> *dist_mat, vector<int> *costs)
         current = next;
     }
 
+    total_cost += (*dist_mat)[current][this->nodes[0]];
+
     return total_cost;
 }
 
