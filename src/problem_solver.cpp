@@ -77,7 +77,8 @@ void ProblemSolver::generate_solutions(string method)
         }
         if (method == "REGRET2_GREEDY_CYCLE")
         {
-            temp_sol = regret2_greedy_cycle_solution(this->n_nodes, i);
+            float regret_proportion = 0.5;
+            temp_sol = regret2_greedy_cycle_solution(this->n_nodes, i, regret_proportion);
             temp_eval = regret2_greedy_cycle_solution_score(temp_sol);
         }
 
@@ -168,13 +169,13 @@ int ProblemSolver::greedy_cycle_solution_score(Solution * greedy_cycle_sol)
     return temp_eval;
 }
 
-RegretGreedyCycle * ProblemSolver::regret2_greedy_cycle_solution(int n_nodes, int start_node)
+RegretGreedyCycle * ProblemSolver::regret2_greedy_cycle_solution(int n_nodes, int start_node, float regret_proportion)
 {
     // Create new random solution
     RegretGreedyCycle * greedy_cycle_sol = new RegretGreedyCycle();
 
     // Generate new solution
-    greedy_cycle_sol->generate(this->dist_mat, this->costs, start_node, n_nodes);
+    greedy_cycle_sol->generate(this->dist_mat, this->costs, regret_proportion, start_node, n_nodes);
 
     // return temp_eval;
     return greedy_cycle_sol;

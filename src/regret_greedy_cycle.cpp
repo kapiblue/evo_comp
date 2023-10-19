@@ -10,7 +10,7 @@
 using namespace std;
 using namespace N;
 
-void RegretGreedyCycle::generate(vector<vector<int>> dist_mat, vector<int> costs, int start_node, int n_nodes)
+void RegretGreedyCycle::generate(vector<vector<int>> dist_mat, vector<int> costs, float regret_proportion, int start_node, int n_nodes)
 {
     this->add_node(start_node);
     int second_node = most_beneficial_node(dist_mat[start_node], costs, this->get_nodes());
@@ -56,10 +56,10 @@ void RegretGreedyCycle::generate(vector<vector<int>> dist_mat, vector<int> costs
 
                     }
                 }
-                float p = 0.5;
+                
                 int tmp_regret = best_2_costs[1] - best_2_costs[0];
                 int tmp_cost = best_2_costs[0];
-                int tmp_obj = p * tmp_regret - (1-p) * tmp_cost;
+                int tmp_obj = regret_proportion * tmp_regret - (1-regret_proportion) * tmp_cost;
             
 
                 if(tmp_obj > biggest_regret){
