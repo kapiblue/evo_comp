@@ -5,6 +5,7 @@
 #include "random_solution.h"
 #include "nearest_neighbor.h"
 #include "greedy_cycle.h"
+#include "regret_greedy_cycle.h"
 
 #ifndef _PROBLEMSOLVER_H
 #define _PROBLEMSOLVER_H
@@ -32,6 +33,9 @@ namespace N
 
         GreedyCycle * greedy_cycle_solution(int n_nodes, int start_node);
         int greedy_cycle_solution_score(Solution * greedy_cycle_sol);
+
+        RegretGreedyCycle * regret2_greedy_cycle_solution(int n_nodes, int start_node);
+        int regret2_greedy_cycle_solution_score(Solution * greedy_cycle_sol);
 
         void print_solution_stats(std::vector<int>* evaluations);
     };

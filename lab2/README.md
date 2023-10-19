@@ -7,3 +7,6 @@ Implement two methods based on greedy cycle heuristic:
 function. By default use equal weights but you can also experiment with other values.
 The structure of the report should be the same as previously. Please include in the summary of
 results please include results of the previous methods.
+
+In dir "evo_comp" execute:
+* g++ src/*.cpp lab2/main.cpp -Isrc -o lab2/src/myprogram -std=c++17 && ./lab2/src/myprogram

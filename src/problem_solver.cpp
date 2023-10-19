@@ -4,6 +4,7 @@
 #include "random_solution.h"
 #include "nearest_neighbor.h"
 #include "greedy_cycle.h"
+#include "regret_greedy_cycle.h"
 #include "utils.h"
 
 #include <iostream>
@@ -74,6 +75,11 @@ void ProblemSolver::generate_solutions(string method)
             temp_sol = greedy_cycle_solution(this->n_nodes, i);
             temp_eval = greedy_cycle_solution_score(temp_sol);
         }
+        if (method == "REGRET2_GREEDY_CYCLE")
+        {
+            temp_sol = regret2_greedy_cycle_solution(this->n_nodes, i);
+            temp_eval = regret2_greedy_cycle_solution_score(temp_sol);
+        }
 
         solutions.push_back(temp_sol);
         evaluations.push_back(temp_eval);
@@ -83,7 +89,7 @@ void ProblemSolver::generate_solutions(string method)
     int best_sol_idx = distance(begin(evaluations), it);
     temp_sol = solutions[best_sol_idx];
     // Export best solution
-    string filename = "../solutions/" + this->instance_name + "/" + method + ".csv";
+    string filename = "lab2/solutions/" + this->instance_name + "/" + method + ".csv";
     temp_sol->write_to_csv(filename);
 
     cout << method << endl;
@@ -152,6 +158,29 @@ GreedyCycle * ProblemSolver::greedy_cycle_solution(int n_nodes, int start_node)
 }
 
 int ProblemSolver::greedy_cycle_solution_score(Solution * greedy_cycle_sol)
+{
+    // For temporal storage
+    int temp_eval;
+
+    // Evaluate solution
+    temp_eval = greedy_cycle_sol->evaluate(&this->dist_mat, &this->costs);
+
+    return temp_eval;
+}
+
+RegretGreedyCycle * ProblemSolver::regret2_greedy_cycle_solution(int n_nodes, int start_node)
+{
+    // Create new random solution
+    RegretGreedyCycle * greedy_cycle_sol = new RegretGreedyCycle();
+
+    // Generate new solution
+    greedy_cycle_sol->generate(this->dist_mat, this->costs, start_node, n_nodes);
+
+    // return temp_eval;
+    return greedy_cycle_sol;
+}
+
+int ProblemSolver::regret2_greedy_cycle_solution_score(Solution * greedy_cycle_sol)
 {
     // For temporal storage
     int temp_eval;
