@@ -1,4 +1,5 @@
 #include "solution.h"
+#include <utils.h>
 
 #include <iostream>
 #include <string>
@@ -83,4 +84,22 @@ void Solution::write_to_csv(string filename)
         myfile << this->nodes[i] << endl;
     }
     myfile.close();
+}
+
+int Solution::most_beneficial_node(vector<int> all_distances, vector<int> all_costs, vector<int> excluded_nodes){
+    
+    int min_idx = -1;
+    int min_total_cost = numeric_limits<int>::max();
+
+    for(int i=0; i<all_distances.size(); i++){
+        if(!contain(excluded_nodes, i)){
+
+            int tmp_total_cost = all_distances[i]+ all_costs[i];
+            if(tmp_total_cost < min_total_cost){
+                min_idx = i;
+                min_total_cost = tmp_total_cost;
+            }
+        }
+    }
+    return min_idx;
 }

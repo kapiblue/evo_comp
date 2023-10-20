@@ -9,4 +9,7 @@ The structure of the report should be the same as previously. Please include in 
 results please include results of the previous methods.
 
 In dir "evo_comp" execute:
-* g++ src/*.cpp lab2/main.cpp -Isrc -o lab2/src/myprogram -std=c++17 && ./lab2/src/myprogram
+
+```bash
+g++ src/*.cpp lab2/main.cpp -Isrc -o lab2/myprogram -std=c++17 && ./lab2/myprogram
+```
