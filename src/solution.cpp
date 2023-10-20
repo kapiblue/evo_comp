@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <set>
 
 using namespace std;
 using namespace N;
@@ -12,6 +13,12 @@ void Solution::add_node(int node)
 {
     // Add node to solution vector
     this->nodes.push_back(node);
+    this->node_set.insert(node);
+}
+
+bool Solution::contains(int node){
+
+    return this->node_set.contains(node);
 }
 
 void Solution::set_nodes(vector<int> nodes)

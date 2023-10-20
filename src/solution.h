@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <set>
 
 #ifndef _SOLUTION_H
 #define _SOLUTION_H
@@ -12,13 +13,15 @@ namespace N
 
     private:
         std::vector<int> nodes;
+        std::set<int> node_set;
 
     public:
         void add_node(int node);
+        bool contains(int node);
         void set_nodes(std::vector<int> nodes);
         std::vector<int> get_nodes();
         int get_number_of_nodes();
-        int evaluate(std::vector<std::vector<int>>* dist_mat, std::vector<int> *costs);
+        int evaluate(std::vector<std::vector<int>> *dist_mat, std::vector<int> *costs);
         void print();
         void write_to_csv(std::string filename);
         int most_beneficial_node(std::vector<int> all_distances, std::vector<int> all_costs, std::vector<int> excluded_distances);

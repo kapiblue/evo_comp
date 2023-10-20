@@ -11,5 +11,5 @@ results please include results of the previous methods.
 In dir "evo_comp" execute:
 
 ```bash
-g++ src/*.cpp lab2/main.cpp -Isrc -o lab2/myprogram -std=c++17 && ./lab2/myprogram
+g++ src/*.cpp lab2/main.cpp -Isrc -o lab2/myprogram -std=c++20 && ./lab2/myprogram
 ```

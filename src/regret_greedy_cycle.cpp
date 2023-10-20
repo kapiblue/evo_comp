@@ -30,7 +30,7 @@ void RegretGreedyCycle::generate(vector<vector<int>> dist_mat, vector<int> costs
         for (int node_idx = 0; node_idx < dist_mat.size(); node_idx++)
         {
 
-            if (!contain(this->get_nodes(), node_idx))
+            if (!this->contains(node_idx))
             {
 
                 vector<int> best_2_node_idxs = vector<int>{-1, -1};
