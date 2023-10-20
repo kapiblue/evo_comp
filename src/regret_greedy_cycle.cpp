@@ -1,5 +1,4 @@
 #include "regret_greedy_cycle.h"
-#include "utils.h"
 
 #include <iostream>
 #include <algorithm>
@@ -35,6 +34,7 @@ void RegretGreedyCycle::generate(vector<vector<int>> dist_mat, vector<int> costs
 
                 vector<int> best_2_node_idxs = vector<int>{-1, -1};
                 vector<int> best_2_costs = vector<int>{numeric_limits<int>::max(), numeric_limits<int>::max()};
+                int worst_edge_idx = -1;
 
                 for (int edge_idx = 0; edge_idx < edges.size(); edge_idx++)
                 {
@@ -51,7 +51,7 @@ void RegretGreedyCycle::generate(vector<vector<int>> dist_mat, vector<int> costs
 
                         best_2_costs[1] = best_2_costs[0];
                         best_2_costs[0] = total_cost;
-                        edge_to_remove_idx = edge_idx;
+                        worst_edge_idx = edge_idx;
                     }
                     else if (total_cost < best_2_costs[1])
                     {
@@ -68,6 +68,7 @@ void RegretGreedyCycle::generate(vector<vector<int>> dist_mat, vector<int> costs
                 {
                     biggest_regret = tmp_obj;
                     node_to_add_idx = node_idx;
+                    edge_to_remove_idx = worst_edge_idx;
                 }
             }
         }

@@ -7,10 +7,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-instancesPath = "../lab1/"
-solutionsPath = "../lab1/solutions/"
+instancesPath = "../instance_data/"
+solutionsPath = "../lab2/solutions/"
 
-colors = ['red', 'green', 'blue']
+colors = ['red', 'green', 'blue', 'orange', 'violet']
 
 
 for instancePath in glob(os.path.join(instancesPath, "*.csv")):
@@ -19,6 +19,7 @@ for instancePath in glob(os.path.join(instancesPath, "*.csv")):
     xs, ys, costs = instance
     
     instanceName = instancePath.split('/')[-1].split('.')[0]
+    print(instanceName)
     edges = []
     solutionNames = []
     for edgesPath in glob(os.path.join(solutionsPath, instanceName, "*.csv")):
@@ -29,7 +30,7 @@ for instancePath in glob(os.path.join(instancesPath, "*.csv")):
 
         solutionNames.append(edgesPath.split('/')[-1].split('.')[0])
     # Make plots
-    fig, axs = plt.subplots(1, len(solutionNames), figsize=(16, 5), dpi = 200)
+    fig, axs = plt.subplots(1, len(solutionNames), figsize=(len(solutionNames)*5, 5), dpi = 300)
     fig.suptitle(instanceName, fontsize=20)
     
     for i, ax in enumerate(axs.flat):
