@@ -14,15 +14,8 @@ solutions.
 
 ### Compilation instructions
 
-Open terminal in the /src directory and run the command:
-```
-g++ *.cpp --std=c++17 -o my_program
-```
+Open terminal in `evo_comp` directory and run:
+```bash
+g++ src/*.cpp lab1/main.cpp -Isrc -o lab1/myprogram -std=c++20 && ./lab1/myprogram
 
-In order to run the file:
 ```
-./my_program
-```
-
-g++ src/*.cpp lab1/main.cpp -Isrc -o lab1/myprogram -std=c++17
-

@@ -44,5 +44,7 @@ for instancePath in glob(os.path.join(instancesPath, "*.csv")):
         ax.set_title(solutionNames[i])
         ax.set(xlabel='x', ylabel='y')
         ax.label_outer()
+
+    fig.tight_layout()
     # Save
     fig.savefig(f"./{instanceName}.jpg")

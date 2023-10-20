@@ -77,7 +77,7 @@ void ProblemSolver::generate_solutions(string method)
         }
         if (method == "REGRET2_GREEDY_CYCLE")
         {
-            float regret_proportion = 0.5;
+            float regret_proportion = 1.0;
             temp_sol = regret2_greedy_cycle_solution(this->n_nodes, i, regret_proportion);
             temp_eval = regret2_greedy_cycle_solution_score(temp_sol);
         }
