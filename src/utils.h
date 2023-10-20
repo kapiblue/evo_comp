@@ -3,6 +3,8 @@
 #include <numeric>   // iota
 #include <algorithm> // sort
 
+#include "problem_solver.h"
+
 #ifndef _UTILS_H
 #define _UTILS_H
 
@@ -55,5 +57,9 @@ std::vector<size_t> argsort(const std::vector<T> &v)
 
     return idx;
 }
+
+void measure_generation_time(std::string method,
+                             N::ProblemSolver *obj,
+                             void (N::ProblemSolver::*func)(std::string));
 
 #endif

@@ -4,8 +4,10 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <chrono>
 
 #include "utils.h"
+#include "problem_solver.h"
 
 using namespace std;
 
@@ -58,4 +60,15 @@ double euclidean_distance(int x1, int y1, int x2, int y2)
     euc_dist = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 
     return euc_dist;
+}
+
+void measure_generation_time(std::string method,
+                             N::ProblemSolver *obj,
+                             void (N::ProblemSolver::*func)(std::string))
+{
+
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    (obj->*func)(method);
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::cout << "Generation time = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
 }
