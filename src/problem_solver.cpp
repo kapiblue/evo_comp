@@ -202,3 +202,8 @@ void ProblemSolver::print_solution_stats(std::vector<int> *evaluations)
 
     cout << "MIN " << min << " AVG " << average << " MAX " << max << endl;
 }
+
+int ProblemSolver::get_total_nodes()
+{
+    return this->total_nodes;
+}

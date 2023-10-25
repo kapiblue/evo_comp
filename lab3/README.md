@@ -30,3 +30,9 @@ Method 2 av (min – max) av (min – max)
 Include also results for all previous methods.
 Report two tables one for the values of the objective function and for the running times.
 The outline of the report as previously.
+
+In dir "evo_comp" execute:
+
+```bash
+g++ src/*.cpp lab3/main.cpp -Isrc -o lab3/myprogram -std=c++20 && ./lab3/myprogram
+```
