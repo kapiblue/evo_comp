@@ -31,6 +31,7 @@ namespace N
         int get_prev_node_idx(int node_idx);
         void find_not_selected(std::set<int> not_selected, std::set<int> *all_nodes);
         void exchange_node_at_idx(int node_idx, int new_node);
+        void exchange_2_nodes(int node_idx1, int node_idx2);
 
         int evaluate(std::vector<std::vector<int>> *dist_mat,
                      std::vector<int> *costs);

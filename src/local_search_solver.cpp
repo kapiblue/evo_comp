@@ -4,6 +4,7 @@
 #include <string>
 #include <set>
 #include <iostream>
+#include <limits>
 
 using namespace std;
 using namespace N;
@@ -28,13 +29,37 @@ void LocalSearchSolver::run_steepest(string neigh_method)
     while (this->best_sol_evaluation < iter_best_evaluation)
     {
         iter_best_evaluation = this->best_sol_evaluation;
-        find_best_inter_neighbor();
+        find_best_intra_neighbor_node();
         cout << this->best_sol_evaluation << endl;
     }
+    this->best_solution.print();
 }
 // TODO
 
 // find_best_intra_neighbor_nodes() greedy?
+void LocalSearchSolver::find_best_intra_neighbor_node(){
+
+    int nodes_number = this->best_solution.get_number_of_nodes();
+    int min_delta = 0;
+    int min_node1_idx = -1;
+    int min_node2_idx = -1;
+
+    for (int node1_idx = 0; node1_idx < nodes_number; node1_idx++)
+    {
+        for (int node2_idx = node1_idx + 1; node2_idx < nodes_number; node2_idx++)
+        {
+            int delta = this->best_solution.calculate_delta_intra_route_nodes(&this->dist_mat, &this->costs, node1_idx, node2_idx);
+            if(delta < min_delta){
+                min_delta = delta;
+                min_node1_idx = node1_idx;
+                min_node2_idx = node2_idx;
+            }
+        }
+    }
+    this->best_solution.exchange_2_nodes(min_node1_idx, min_node2_idx);
+    this->best_sol_evaluation = this->best_sol_evaluation + min_delta;
+}
+
 // find_best_intra_neighbor_edges() greedy?
 //      -> solution.cpp calculate_delta_intra_route_edges
 
@@ -66,6 +91,8 @@ void LocalSearchSolver::find_best_inter_neighbor()
                 {
                     // The neighbor solution is better
                     delta = temp_delta;
+
+                    // nie wiem czy tu już powinniśmy updateować
                     this->best_solution.exchange_node_at_idx(i, j);
                     temp_evaluation = this->best_sol_evaluation + temp_delta;
                     this->best_sol_evaluation = temp_evaluation;
@@ -74,4 +101,6 @@ void LocalSearchSolver::find_best_inter_neighbor()
             }
         }
     }
+
+    //update pewnie tutaj jak już wszystkie możliwości przeszukamy
 }

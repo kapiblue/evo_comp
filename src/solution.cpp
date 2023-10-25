@@ -68,8 +68,16 @@ void Solution::find_not_selected(std::set<int> not_selected, std::set<int> *all_
 void Solution::exchange_node_at_idx(int node_idx, int new_node)
 {
     this->nodes[node_idx] = new_node;
-
 }
+
+void Solution::exchange_2_nodes(int node_idx1, int node_idx2)
+{
+    int tmp_node = this->nodes[node_idx1];
+    this->nodes[node_idx1] = this->nodes[node_idx2];
+    this->nodes[node_idx2] = tmp_node;
+    cout << this->nodes[node_idx1] << " " << this->nodes[node_idx2]<< endl;
+}
+
 
 int Solution::evaluate(vector<vector<int>> *dist_mat, vector<int> *costs)
 {
@@ -139,7 +147,7 @@ int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_m
                                                 int first_idx,
                                                 int second_idx)
 {
-    int delta;
+    int delta = 0;
 
     int first_node = this->nodes[first_idx];
     int second_node = this->nodes[second_idx];
@@ -161,7 +169,6 @@ int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_m
     // Calculations for the first node
     this->subtract_distance_from_delta(&delta, dist_mat, first_prev_node, first_node, first_next_node);
     this->add_distance_to_delta(&delta, dist_mat, second_prev_node, first_node, second_next_node);
-
     // Calculations for the second node
     this->subtract_distance_from_delta(&delta, dist_mat, second_prev_node, second_node, second_next_node);
     this->add_distance_to_delta(&delta, dist_mat, first_prev_node, second_node, first_next_node);
