@@ -32,7 +32,14 @@ void LocalSearchSolver::run_steepest(string neigh_method)
         cout << this->best_sol_evaluation << endl;
     }
 }
+// TODO
 
+// find_best_intra_neighbor_nodes() greedy?
+// find_best_intra_neighbor_edges() greedy?
+//      -> solution.cpp calculate_delta_intra_route_edges
+
+
+// string method parameter?
 void LocalSearchSolver::find_best_inter_neighbor()
 {
     // Finds best neighbor by exchanging some selected node
@@ -46,9 +53,10 @@ void LocalSearchSolver::find_best_inter_neighbor()
     // set<int> not_selected;
     // this->best_solution.find_not_selected(not_selected, &this->all_nodes);
 
+    // random order on indexes for greedy?
     for (int i = 0; i < this->best_solution.get_number_of_nodes(); i++)
     {
-        for (int j = i + 1; j < this->best_solution.get_number_of_nodes(); j++)
+        for (int j = i + 1; j < this->total_nodes; j++)
         {
             if (!this->best_solution.contains(j))
             {
