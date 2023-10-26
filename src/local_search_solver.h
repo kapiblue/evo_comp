@@ -19,8 +19,9 @@ namespace N
     public:
         LocalSearchSolver(std::string instance_filename, double fraction_nodes, Solution initial_solution);
         void run_steepest(std::string neigh_method);
-        void find_best_inter_neighbor();
-        void find_best_intra_neighbor_node();
+        void find_best_inter_neighbor(int *best_eval, int *exchanged_node, int *new_node);
+        void find_best_intra_neighbor_nodes(int *best_eval, int *first_node_idx, int *second_node_idx);
+        void apply_move(std::string move_type, int *arg1, int *arg2);
     };
 }
 

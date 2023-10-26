@@ -6,7 +6,6 @@
 #include <iostream>
 #include <limits>
 
-
 using namespace std;
 using namespace N;
 
@@ -27,12 +26,34 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
 
 void LocalSearchSolver::run_steepest(string neigh_method)
 {
-    int iter_best_evaluation = numeric_limits<int>::max();
+    int current_best_delta = -1;
+    int best_inter_delta, best_intra_nodes_delta, best_intra_edges_delta;
 
-    while (this->best_sol_evaluation < iter_best_evaluation)
+    int arg1, arg2, temp_arg1, temp_arg2;
+    string move_type;
+
+    while (current_best_delta < 0)
     {
-        iter_best_evaluation = this->best_sol_evaluation;
-        find_best_inter_neighbor();
+        current_best_delta = 0;
+        find_best_inter_neighbor(&best_inter_delta, &temp_arg1, &temp_arg2);
+        if (best_inter_delta < current_best_delta)
+        {
+            arg1 = temp_arg1;
+            arg2 = temp_arg2;
+            move_type = "inter";
+            current_best_delta = best_inter_delta;
+        }
+        // find_best_intra_neighbor_nodes(&best_intra_nodes_delta, &temp_arg1, &temp_arg2);
+        // if (best_intra_nodes_delta < current_best_delta)
+        // {
+        //     arg1 = temp_arg1;
+        //     arg2 = temp_arg2;
+        //     move_type = "intra_nodes";
+        //     current_best_delta = best_intra_nodes_delta;
+        // }
+        this->best_sol_evaluation += current_best_delta;
+        apply_move(move_type, &arg1, &arg2);
+
         cout << this->best_sol_evaluation << endl;
     }
     this->best_solution.print();
@@ -40,19 +61,20 @@ void LocalSearchSolver::run_steepest(string neigh_method)
 // TODO
 
 // find_best_intra_neighbor_nodes() greedy?
-void LocalSearchSolver::find_best_intra_neighbor_node()
+void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *first_node_idx, int *second_node_idx)
 {
-
     int nodes_number = this->best_solution.get_number_of_nodes();
     int min_delta = 0;
     int min_node1_idx = -1;
     int min_node2_idx = -1;
+    int delta;
 
     for (int node1_idx = 0; node1_idx < nodes_number; node1_idx++)
     {
         for (int node2_idx = node1_idx + 1; node2_idx < nodes_number; node2_idx++)
         {
-            int delta = this->best_solution.calculate_delta_intra_route_nodes(&this->dist_mat, &this->costs, node1_idx, node2_idx);
+            delta = this->best_solution.calculate_delta_intra_route_nodes(&this->dist_mat,
+                                                                          &this->costs, node1_idx, node2_idx);
             if (delta < min_delta)
             {
                 min_delta = delta;
@@ -61,15 +83,16 @@ void LocalSearchSolver::find_best_intra_neighbor_node()
             }
         }
     }
-    this->best_solution.exchange_2_nodes(min_node1_idx, min_node2_idx);
-    this->best_sol_evaluation = this->best_sol_evaluation + min_delta;
+    *out_delta = min_delta;
+    *first_node_idx = min_node1_idx;
+    *second_node_idx = min_node2_idx;
 }
 
 // find_best_intra_neighbor_edges() greedy?
 //      -> solution.cpp calculate_delta_intra_route_edges
 
 // string method parameter?
-void LocalSearchSolver::find_best_inter_neighbor()
+void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_node, int *new_node)
 {
     // Finds best neighbor by exchanging some selected node
     // with a not selected node
@@ -102,9 +125,21 @@ void LocalSearchSolver::find_best_inter_neighbor()
             }
         }
     }
-    if (delta < 0)
+    *out_delta = min_delta;
+    *exchanged_node = min_exchanged_idx;
+    *new_node = min_new_node;
+}
+
+void LocalSearchSolver::apply_move(string move_type, int *arg1, int *arg2)
+{
+    if (move_type == "inter")
     {
-        this->best_solution.exchange_node_at_idx(min_exchanged_idx, min_new_node);
-        this->best_sol_evaluation += min_delta;
+        cout << "inter" << endl;
+        this->best_solution.exchange_node_at_idx(*arg1, *arg2);
+    }
+    else if (move_type == "intra_nodes")
+    {
+        cout << "intra" << endl;
+        this->best_solution.exchange_2_nodes(*arg1, *arg2);
     }
 }
