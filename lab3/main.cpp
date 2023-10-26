@@ -6,6 +6,8 @@
 #include <vector>
 #include <iostream>
 #include <chrono>
+#include <random>
+#include <time.h>
 
 using namespace std;
 using namespace N;
@@ -17,6 +19,7 @@ vector<string> instances = {"instance_data/TSPA.csv",
 
 int main()
 {
+    srand(time(NULL));
     RandomSolution initial_solution = RandomSolution();
     initial_solution.generate(200, 100);
     for (auto instance_filename : instances)

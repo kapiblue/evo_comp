@@ -21,7 +21,6 @@ void Solution::add_node(int node)
 
 bool Solution::contains(int node)
 {
-
     return this->selected.contains(node);
 }
 
@@ -47,6 +46,11 @@ int Solution::get_number_of_nodes()
     return this->n_nodes;
 }
 
+set<int> Solution::get_selected()
+{
+    return this->selected;
+}
+
 int Solution::get_next_node_idx(int node_idx)
 {
     return (node_idx + 1) % this->n_nodes;
@@ -67,6 +71,10 @@ void Solution::find_not_selected(std::set<int> not_selected, std::set<int> *all_
 
 void Solution::exchange_node_at_idx(int node_idx, int new_node)
 {
+    // Update the selected set
+    this->selected.insert(new_node);
+    this->selected.erase(this->nodes[node_idx]);
+    
     this->nodes[node_idx] = new_node;
 }
 
@@ -75,18 +83,17 @@ void Solution::exchange_2_nodes(int node_idx1, int node_idx2)
     int tmp_node = this->nodes[node_idx1];
     this->nodes[node_idx1] = this->nodes[node_idx2];
     this->nodes[node_idx2] = tmp_node;
-    cout << this->nodes[node_idx1] << " " << this->nodes[node_idx2]<< endl;
+    cout << this->nodes[node_idx1] << " " << this->nodes[node_idx2] << endl;
 }
-
 
 int Solution::evaluate(vector<vector<int>> *dist_mat, vector<int> *costs)
 {
     // If evaluation was already calculated
     // return the stored value
-    if (this->evaluation > 0)
-    {
-        return this->evaluation;
-    }
+    // if (this->evaluation > 0)
+    // {
+    //     return this->evaluation;
+    // }
 
     int temp_node_cost, temp_dist;
 
