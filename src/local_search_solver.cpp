@@ -52,9 +52,17 @@ void LocalSearchSolver::run_steepest(string neigh_method)
             move_type = "intra_nodes";
             current_best_delta = best_intra_nodes_delta;
         }
+        // find_best_intra_neighbor_edges(&best_intra_edges_delta, &temp_arg1, &temp_arg2);
+        // if (best_intra_edges_delta < current_best_delta)
+        // {
+        //     arg1 = temp_arg1;
+        //     arg2 = temp_arg2;
+        //     move_type = "intra_edges";
+        //     current_best_delta = best_intra_edges_delta;
+        // }
         this->best_sol_evaluation += current_best_delta;
         apply_move(move_type, &arg1, &arg2);
-
+        cout << "Move type " << move_type << " Delta " << current_best_delta << endl;
         cout << this->best_sol_evaluation << endl;
     }
     this->best_solution.print();
@@ -84,7 +92,6 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
             }
         }
     }
-    cout << "Delta " << min_delta << " ";
     *out_delta = min_delta;
     *first_node_idx = min_node1_idx;
     *second_node_idx = min_node2_idx;
@@ -94,6 +101,35 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
 //      -> solution.cpp calculate_delta_intra_route_edges
 
 // string method parameter?
+
+void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *first_edge_idx, int *second_edge_idx)
+{
+    // We assume edge 0 to connect nodes[0] with nodes[1]
+    // Last edge is between last node and the first node
+    int edges_number = this->best_solution.get_number_of_nodes();
+    int min_delta = 0;
+    int min_edge1_idx = -1;
+    int min_edge2_idx = -1;
+    int delta;
+
+    for (int edge1_idx = 0; edge1_idx < edges_number; edge1_idx++)
+    {
+        for (int edge2_idx = edge1_idx + 2; edge2_idx < edges_number; edge2_idx++)
+        {
+            delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
+                                                                          edge1_idx, edge2_idx);
+            if (delta < min_delta)
+            {
+                min_delta = delta;
+                min_edge1_idx = edge1_idx;
+                min_edge2_idx = edge2_idx;
+            }
+        }
+    }
+    *out_delta = min_delta;
+    *first_edge_idx = min_edge1_idx;
+    *second_edge_idx = min_edge2_idx;
+}
 void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_node, int *new_node)
 {
     // Finds best neighbor by exchanging some selected node
@@ -134,14 +170,17 @@ void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_
 
 void LocalSearchSolver::apply_move(string move_type, int *arg1, int *arg2)
 {
+    cout << move_type << endl;
     if (move_type == "inter")
     {
-        cout << "inter" << endl;
         this->best_solution.exchange_node_at_idx(*arg1, *arg2);
     }
     else if (move_type == "intra_nodes")
     {
-        cout << "intra" << endl;
         this->best_solution.exchange_2_nodes(*arg1, *arg2);
+    }
+    else if (move_type == "intra_edges")
+    {
+        this->best_solution.exchange_2_edges(*arg1, *arg2);
     }
 }

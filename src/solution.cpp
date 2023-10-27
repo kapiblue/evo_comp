@@ -99,6 +99,12 @@ bool Solution::are_consecutive(int node1_idx, int node2_idx)
     }
 }
 
+void Solution::exchange_2_edges(int edge1_idx, int edge2_idx)
+{
+    cout << edge1_idx << " " << edge2_idx << endl;
+    reverse(this->nodes.begin() + edge1_idx + 1, this->nodes.begin() + edge2_idx + 1);
+}
+
 int Solution::evaluate(vector<vector<int>> *dist_mat, vector<int> *costs)
 {
     // If evaluation was already calculated
@@ -190,7 +196,7 @@ int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_m
     int second_prev_node = this->nodes[second_prev_node_idx];
     int second_next_node = this->nodes[second_next_node_idx];
 
-    // Subtract first
+    // Subtract distances
     this->subtract_distance_from_delta(&delta, dist_mat, first_prev_node, first_node, first_next_node);
     this->subtract_distance_from_delta(&delta, dist_mat, second_prev_node, second_node, second_next_node);
 
@@ -211,9 +217,31 @@ int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_m
         }
     }
 
-    // Add costs
+    // Add distances
     this->add_distance_to_delta(&delta, dist_mat, second_prev_node, first_node, second_next_node);
     this->add_distance_to_delta(&delta, dist_mat, first_prev_node, second_node, first_next_node);
+
+    return delta;
+}
+
+int Solution::calculate_delta_intra_route_edges(std::vector<std::vector<int>> *dist_mat,
+                                                int first_edge_idx, int second_edge_idx)
+{
+    int delta = 0;
+
+    // Get the nodes that are connected by edges
+    int node1edge1 = this->nodes[first_edge_idx];
+    int node2edge1 = this->nodes[get_next_node_idx(first_edge_idx)];
+    int node1edge2 = this->nodes[second_edge_idx];
+    int node2edge2 = this->nodes[get_next_node_idx(second_edge_idx)];
+
+    // Subtract distances of erased edges
+    delta -= (*dist_mat)[node1edge1][node2edge1];
+    delta -= (*dist_mat)[node1edge2][node2edge2];
+
+    // Add distances of new edges
+    delta += (*dist_mat)[node1edge1][node1edge2];
+    delta += (*dist_mat)[node2edge1][node2edge2];
 
     return delta;
 }

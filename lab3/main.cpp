@@ -22,11 +22,13 @@ int main()
     srand(time(NULL));
     RandomSolution initial_solution = RandomSolution();
     initial_solution.generate(200, 100);
+    initial_solution.print();
     for (auto instance_filename : instances)
     {
         LocalSearchSolver lss = LocalSearchSolver(instance_filename, 0.5, initial_solution);
         lss.run_steepest("TWO_NODES");
     }
+    initial_solution.print();
 
     return 0;
 }
