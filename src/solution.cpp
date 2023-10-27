@@ -74,7 +74,7 @@ void Solution::exchange_node_at_idx(int node_idx, int new_node)
     // Update the selected set
     this->selected.insert(new_node);
     this->selected.erase(this->nodes[node_idx]);
-    
+
     this->nodes[node_idx] = new_node;
 }
 
@@ -83,7 +83,20 @@ void Solution::exchange_2_nodes(int node_idx1, int node_idx2)
     int tmp_node = this->nodes[node_idx1];
     this->nodes[node_idx1] = this->nodes[node_idx2];
     this->nodes[node_idx2] = tmp_node;
-    cout << this->nodes[node_idx1] << " " << this->nodes[node_idx2] << endl;
+}
+
+bool Solution::are_consecutive(int node1_idx, int node2_idx)
+{
+    int node1_next_idx = get_next_node_idx(node1_idx);
+    int node1_prev_idx = get_prev_node_idx(node1_idx);
+    if (node1_next_idx == node2_idx || node1_prev_idx == node2_idx)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 int Solution::evaluate(vector<vector<int>> *dist_mat, vector<int> *costs)
@@ -150,7 +163,6 @@ int Solution::calculate_delta_inter_route(vector<vector<int>> *dist_mat, vector<
 }
 
 int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_mat,
-                                                vector<int> *costs,
                                                 int first_idx,
                                                 int second_idx)
 {
@@ -158,6 +170,11 @@ int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_m
 
     int first_node = this->nodes[first_idx];
     int second_node = this->nodes[second_idx];
+
+    if (first_node == second_node)
+    {
+        return 0;
+    }
 
     // Get previous and next of the first node
     int first_prev_node_idx = this->get_prev_node_idx(first_idx);
@@ -173,11 +190,29 @@ int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_m
     int second_prev_node = this->nodes[second_prev_node_idx];
     int second_next_node = this->nodes[second_next_node_idx];
 
-    // Calculations for the first node
+    // Subtract first
     this->subtract_distance_from_delta(&delta, dist_mat, first_prev_node, first_node, first_next_node);
-    this->add_distance_to_delta(&delta, dist_mat, second_prev_node, first_node, second_next_node);
-    // Calculations for the second node
     this->subtract_distance_from_delta(&delta, dist_mat, second_prev_node, second_node, second_next_node);
+
+    // Handle the case when exchanged nodes
+    // are consecutive
+    if (are_consecutive(first_idx, second_idx))
+    {
+        delta += (*dist_mat)[first_idx][second_idx];
+        if (first_next_node_idx == second_idx)
+        {
+            second_prev_node = first_prev_node;
+            first_next_node = second_next_node;
+        }
+        else if (first_prev_node_idx == second_idx)
+        {
+            first_prev_node = second_prev_node;
+            second_next_node = first_next_node;
+        }
+    }
+
+    // Add costs
+    this->add_distance_to_delta(&delta, dist_mat, second_prev_node, first_node, second_next_node);
     this->add_distance_to_delta(&delta, dist_mat, first_prev_node, second_node, first_next_node);
 
     return delta;

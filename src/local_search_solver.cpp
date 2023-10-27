@@ -16,6 +16,7 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
     this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
 
     cout << "Init eval " << this->best_sol_evaluation << endl;
+    cout << this->best_solution.get_number_of_nodes();
 
     // Initialize set of all node indexes
     for (int i = 0; i < this->total_nodes; i++)
@@ -43,14 +44,14 @@ void LocalSearchSolver::run_steepest(string neigh_method)
             move_type = "inter";
             current_best_delta = best_inter_delta;
         }
-        // find_best_intra_neighbor_nodes(&best_intra_nodes_delta, &temp_arg1, &temp_arg2);
-        // if (best_intra_nodes_delta < current_best_delta)
-        // {
-        //     arg1 = temp_arg1;
-        //     arg2 = temp_arg2;
-        //     move_type = "intra_nodes";
-        //     current_best_delta = best_intra_nodes_delta;
-        // }
+        find_best_intra_neighbor_nodes(&best_intra_nodes_delta, &temp_arg1, &temp_arg2);
+        if (best_intra_nodes_delta < current_best_delta)
+        {
+            arg1 = temp_arg1;
+            arg2 = temp_arg2;
+            move_type = "intra_nodes";
+            current_best_delta = best_intra_nodes_delta;
+        }
         this->best_sol_evaluation += current_best_delta;
         apply_move(move_type, &arg1, &arg2);
 
@@ -74,7 +75,7 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
         for (int node2_idx = node1_idx + 1; node2_idx < nodes_number; node2_idx++)
         {
             delta = this->best_solution.calculate_delta_intra_route_nodes(&this->dist_mat,
-                                                                          &this->costs, node1_idx, node2_idx);
+                                                                          node1_idx, node2_idx);
             if (delta < min_delta)
             {
                 min_delta = delta;
@@ -83,6 +84,7 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
             }
         }
     }
+    cout << "Delta " << min_delta << " ";
     *out_delta = min_delta;
     *first_node_idx = min_node1_idx;
     *second_node_idx = min_node2_idx;

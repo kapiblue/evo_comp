@@ -32,7 +32,8 @@ namespace N
         int get_prev_node_idx(int node_idx);
         void find_not_selected(std::set<int> not_selected, std::set<int> *all_nodes);
         void exchange_node_at_idx(int node_idx, int new_node);
-        void exchange_2_nodes(int node_idx1, int node_idx2);
+        void exchange_2_nodes(int node1_idx, int node2_idx);
+        bool are_consecutive(int node1_idx, int node2_idx);
 
         int evaluate(std::vector<std::vector<int>> *dist_mat,
                      std::vector<int> *costs);
@@ -45,7 +46,6 @@ namespace N
                                         std::vector<int> *costs,
                                         int exchange_idx, int new_node);
         int calculate_delta_intra_route_nodes(std::vector<std::vector<int>> *dist_mat,
-                                              std::vector<int> *costs,
                                               int first_idx, int second_idx);
         void subtract_distance_from_delta(int *delta, std::vector<std::vector<int>> *dist_mat,
                                           int prev_node, int current_node, int next_node);
