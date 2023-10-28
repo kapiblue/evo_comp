@@ -26,7 +26,7 @@ int main()
     for (auto instance_filename : instances)
     {
         LocalSearchSolver lss = LocalSearchSolver(instance_filename, 0.5, initial_solution);
-        lss.run_steepest("TWO_NODES");
+        lss.run_steepest("TWO_NODES", "GREEDY");
     }
     initial_solution.print();
 
