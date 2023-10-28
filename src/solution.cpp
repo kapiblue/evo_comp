@@ -196,9 +196,7 @@ int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_m
     int second_prev_node = this->nodes[second_prev_node_idx];
     int second_next_node = this->nodes[second_next_node_idx];
 
-    // Subtract distances
-    this->subtract_distance_from_delta(&delta, dist_mat, first_prev_node, first_node, first_next_node);
-    this->subtract_distance_from_delta(&delta, dist_mat, second_prev_node, second_node, second_next_node);
+    
 
     // Handle the case when exchanged nodes
     // are consecutive
@@ -216,6 +214,10 @@ int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_m
             second_next_node = first_next_node;
         }
     }
+
+    // Subtract distances
+    this->subtract_distance_from_delta(&delta, dist_mat, first_prev_node, first_node, first_next_node);
+    this->subtract_distance_from_delta(&delta, dist_mat, second_prev_node, second_node, second_next_node);
 
     // Add distances
     this->add_distance_to_delta(&delta, dist_mat, second_prev_node, first_node, second_next_node);
