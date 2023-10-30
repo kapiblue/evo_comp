@@ -52,20 +52,26 @@ void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
             move_type = "intra_nodes";
             current_best_delta = best_intra_nodes_delta;
         }
-        // find_best_intra_neighbor_edges(&best_intra_edges_delta, &temp_arg1, &temp_arg2, search_method);
-        // if (best_intra_edges_delta < current_best_delta)
-        // {
-        //     arg1 = temp_arg1;
-        //     arg2 = temp_arg2;
-        //     move_type = "intra_edges";
-        //     current_best_delta = best_intra_edges_delta;
-        // }
+        find_best_intra_neighbor_edges(&best_intra_edges_delta, &temp_arg1, &temp_arg2, search_method);
+        if (best_intra_edges_delta < current_best_delta)
+        {
+            arg1 = temp_arg1;
+            arg2 = temp_arg2;
+            move_type = "intra_edges";
+            current_best_delta = best_intra_edges_delta;
+        }
+        if (current_best_delta >= 0)
+        {
+            break;
+        }
         this->best_sol_evaluation += current_best_delta;
         apply_move(move_type, &arg1, &arg2);
         cout << "Move type " << move_type << " Delta " << current_best_delta << endl;
         cout << arg1 << " " << arg2 << endl;
         cout << this->best_sol_evaluation << endl;
     }
+    int eval = best_solution.evaluate(&this->dist_mat, &this->costs);
+    cout << "Actual evaluation: " << eval << endl;
     this->best_solution.print();
 }
 
