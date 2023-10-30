@@ -35,7 +35,7 @@ ProblemSolver::ProblemSolver(string instance_filename, double fraction_nodes)
     token = token.substr(0, token.find(delimiter));
     this->instance_name = token;
 
-    srand(time(NULL));
+    // srand(time(NULL));
 
     // n_nodes specifies how many nodes
     // should be covered in the solotion

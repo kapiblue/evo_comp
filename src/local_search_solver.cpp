@@ -5,6 +5,9 @@
 #include <set>
 #include <iostream>
 #include <limits>
+#include <random>
+#include <numeric>
+#include <algorithm>
 
 using namespace std;
 using namespace N;
@@ -23,6 +26,18 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
     {
         this->all_nodes.insert(i);
     }
+
+    vector<int> iterator1(this->best_solution.get_number_of_nodes());
+    iota(iterator1.begin(), iterator1.end(), 0);
+    this->iterator1 = iterator1;
+
+    vector<int> iterator2(this->best_solution.get_number_of_nodes());
+    iota(iterator2.begin(), iterator2.end(), 0);
+    this->iterator2 = iterator2;
+
+    vector<int> iterator_long(this->total_nodes);
+    iota(iterator_long.begin(), iterator_long.end(), 0);
+    this->iterator_long = iterator_long;
 }
 
 void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
@@ -33,36 +48,45 @@ void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
     int arg1, arg2, temp_arg1, temp_arg2;
     string move_type;
 
-    vector<void (LocalSearchSolver::*)(int *, int *, int *, string)> functions;
-    functions = {&LocalSearchSolver::find_best_intra_neighbor_edges, &LocalSearchSolver::find_best_inter_neighbor};
+    typedef void (LocalSearchSolver::*VoidFunctionFourParams)(int *, int *, int *, string );
+    vector<VoidFunctionFourParams> neigh_methods;
+    neigh_methods = {&LocalSearchSolver::find_best_inter_neighbor, 
+                &LocalSearchSolver::find_best_intra_neighbor_nodes,
+                &LocalSearchSolver::find_best_intra_neighbor_edges};
+
+    vector<string> move_types = {"inter", "intra_nodes", "intra_edges"};
+
+    vector<int> neigh_methods_idxs = {0};
+    
+    int method_idx = 0;
+    if(neigh_method == "TWO_NODES"){method_idx=1;}
+    if(neigh_method == "TWO_EDGES"){method_idx=2;}
+
+    if(rand()%2 == 1){neigh_methods_idxs.push_back(method_idx);}
+    else{neigh_methods_idxs.insert(neigh_methods_idxs.begin(), method_idx);}
+
+    
+
 
     while (current_best_delta < 0)
     {
+        
         current_best_delta = 0;
-        find_best_inter_neighbor(&best_inter_delta, &temp_arg1, &temp_arg2, search_method);
-        if (best_inter_delta < current_best_delta)
-        {
-            arg1 = temp_arg1;
-            arg2 = temp_arg2;
-            move_type = "inter";
-            current_best_delta = best_inter_delta;
+
+        for(auto& i : neigh_methods_idxs){
+            (this->*neigh_methods[i])(&best_inter_delta, &temp_arg1, &temp_arg2, search_method);
+            if (best_inter_delta < current_best_delta)
+            {
+                arg1 = temp_arg1;
+                arg2 = temp_arg2;
+                move_type = move_types[i];
+                current_best_delta = best_inter_delta;
+                if(search_method=="GREEDY"){
+                    break;
+                }
+            }
         }
-        find_best_intra_neighbor_nodes(&best_intra_nodes_delta, &temp_arg1, &temp_arg2, search_method);
-        if (best_intra_nodes_delta < current_best_delta)
-        {
-            arg1 = temp_arg1;
-            arg2 = temp_arg2;
-            move_type = "intra_nodes";
-            current_best_delta = best_intra_nodes_delta;
-        }
-        find_best_intra_neighbor_edges(&best_intra_edges_delta, &temp_arg1, &temp_arg2, search_method);
-        if (best_intra_edges_delta < current_best_delta)
-        {
-            arg1 = temp_arg1;
-            arg2 = temp_arg2;
-            move_type = "intra_edges";
-            current_best_delta = best_intra_edges_delta;
-        }
+        
         if (current_best_delta >= 0)
         {
             // We don't want to alter the solution
@@ -88,9 +112,14 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
     int min_node2_idx = -1;
     int delta;
 
-    for (int node1_idx = 0; node1_idx < nodes_number; node1_idx++)
+    
+    random_shuffle(this->iterator1.begin(), this->iterator1.end());
+    random_shuffle(this->iterator2.begin(), this->iterator2.end());
+
+
+    for (auto& node1_idx : this->iterator1)
     {
-        for (int node2_idx = node1_idx + 1; node2_idx < nodes_number; node2_idx++)
+        for (auto& node2_idx : this->iterator2)
         {
             delta = this->best_solution.calculate_delta_intra_route_nodes(&this->dist_mat,
                                                                           node1_idx, node2_idx);
@@ -125,24 +154,29 @@ void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *firs
     int min_edge2_idx = -1;
     int delta;
 
-    for (int edge1_idx = 0; edge1_idx < edges_number; edge1_idx++)
-    {
-        for (int edge2_idx = edge1_idx + 2; edge2_idx < edges_number; edge2_idx++)
-        {
-            delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
-                                                                          edge1_idx, edge2_idx);
-            if (delta < min_delta)
-            {
-                min_delta = delta;
-                min_edge1_idx = edge1_idx;
-                min_edge2_idx = edge2_idx;
+    random_shuffle(this->iterator1.begin(), this->iterator1.end());
+    random_shuffle(this->iterator2.begin(), this->iterator2.end());
 
-                if (search_method == "GREEDY")
+    for (auto& edge1_idx : this->iterator1)
+    {
+        for (auto& edge2_idx : this->iterator2)
+        {
+            if(edge1_idx<edge2_idx-1){
+                delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
+                                                                          edge1_idx, edge2_idx);
+                if (delta < min_delta)
                 {
-                    *out_delta = min_delta;
-                    *first_edge_idx = min_edge1_idx;
-                    *second_edge_idx = min_edge2_idx;
-                    return;
+                    min_delta = delta;
+                    min_edge1_idx = edge1_idx;
+                    min_edge2_idx = edge2_idx;
+
+                    if (search_method == "GREEDY")
+                    {
+                        *out_delta = min_delta;
+                        *first_edge_idx = min_edge1_idx;
+                        *second_edge_idx = min_edge2_idx;
+                        return;
+                    }
                 }
             }
         }
@@ -165,11 +199,14 @@ void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_
     // this->best_solution.find_not_selected(not_selected, &this->all_nodes);
 
     // random order on indexes for greedy?
-    for (int j = 0; j < this->total_nodes; j++)
+    random_shuffle(this->iterator1.begin(), this->iterator1.end());
+    random_shuffle(this->iterator_long.begin(), this->iterator_long.end());
+
+    for (auto& j : iterator_long)
     {
         if (!this->best_solution.contains(j))
         {
-            for (int i = 0; i < this->best_solution.get_number_of_nodes(); i++)
+            for (auto& i : iterator1)
             {
                 delta = this->best_solution.calculate_delta_inter_route(&this->dist_mat,
                                                                         &this->costs, i, j);

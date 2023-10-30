@@ -15,6 +15,9 @@ namespace N
         Solution best_solution;
         int best_sol_evaluation;
         std::set<int> all_nodes;
+        std::vector<int> iterator1;
+        std::vector<int> iterator2;
+        std::vector<int> iterator_long;
 
     public:
         LocalSearchSolver(std::string instance_filename, double fraction_nodes, Solution initial_solution);
