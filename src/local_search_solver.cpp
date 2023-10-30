@@ -33,6 +33,9 @@ void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
     int arg1, arg2, temp_arg1, temp_arg2;
     string move_type;
 
+    vector<void (LocalSearchSolver::*)(int *, int *, int *, string)> functions;
+    functions = {&LocalSearchSolver::find_best_intra_neighbor_edges, &LocalSearchSolver::find_best_inter_neighbor};
+
     while (current_best_delta < 0)
     {
         current_best_delta = 0;
@@ -62,6 +65,8 @@ void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
         }
         if (current_best_delta >= 0)
         {
+            // We don't want to alter the solution
+            // if the new current delta is not less than 0
             break;
         }
         this->best_sol_evaluation += current_best_delta;
