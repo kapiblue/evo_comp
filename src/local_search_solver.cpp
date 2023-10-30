@@ -63,14 +63,12 @@ void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
         this->best_sol_evaluation += current_best_delta;
         apply_move(move_type, &arg1, &arg2);
         cout << "Move type " << move_type << " Delta " << current_best_delta << endl;
-        this->best_solution.print();
+        cout << arg1 << " " << arg2 << endl;
         cout << this->best_sol_evaluation << endl;
     }
     this->best_solution.print();
 }
-// TODO
 
-// find_best_intra_neighbor_nodes() greedy?
 void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *first_node_idx, int *second_node_idx, string search_method)
 {
     int nodes_number = this->best_solution.get_number_of_nodes();
@@ -91,7 +89,8 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
                 min_node1_idx = node1_idx;
                 min_node2_idx = node2_idx;
 
-                if(search_method == "GREEDY"){
+                if (search_method == "GREEDY")
+                {
                     *out_delta = min_delta;
                     *first_node_idx = min_node1_idx;
                     *second_node_idx = min_node2_idx;
@@ -104,11 +103,6 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
     *first_node_idx = min_node1_idx;
     *second_node_idx = min_node2_idx;
 }
-
-// find_best_intra_neighbor_edges() greedy?
-//      -> solution.cpp calculate_delta_intra_route_edges
-
-// string method parameter?
 
 void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *first_edge_idx, int *second_edge_idx, string search_method)
 {
@@ -132,7 +126,8 @@ void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *firs
                 min_edge1_idx = edge1_idx;
                 min_edge2_idx = edge2_idx;
 
-                if(search_method == "GREEDY"){
+                if (search_method == "GREEDY")
+                {
                     *out_delta = min_delta;
                     *first_edge_idx = min_edge1_idx;
                     *second_edge_idx = min_edge2_idx;
@@ -175,12 +170,13 @@ void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_
                     min_exchanged_idx = i;
                     min_new_node = j;
 
-                    if(search_method == "GREEDY"){
+                    if (search_method == "GREEDY")
+                    {
                         *out_delta = min_delta;
                         *exchanged_node = min_exchanged_idx;
                         *new_node = min_new_node;
                         return;
-                    }   
+                    }
                 }
             }
         }

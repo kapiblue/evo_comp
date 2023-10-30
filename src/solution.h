@@ -51,9 +51,9 @@ namespace N
         int calculate_delta_intra_route_edges(std::vector<std::vector<int>> *dist_mat,
                                               int first_edge_idx, int second_edge_idx);
         void subtract_distance_from_delta(int *delta, std::vector<std::vector<int>> *dist_mat,
-                                          int prev_node, int current_node, int next_node);
+                                          int first_node, int second_node);
         void add_distance_to_delta(int *delta, std::vector<std::vector<int>> *dist_mat,
-                                   int prev_node, int current_node, int next_node);
+                                   int first_node, int second_node);
 
         void print();
         void write_to_csv(std::string filename);

@@ -28,7 +28,6 @@ int main()
         LocalSearchSolver lss = LocalSearchSolver(instance_filename, 0.5, initial_solution);
         lss.run_steepest("TWO_NODES", "GREEDY");
     }
-    initial_solution.print();
 
     return 0;
 }

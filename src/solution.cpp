@@ -160,10 +160,12 @@ int Solution::calculate_delta_inter_route(vector<vector<int>> *dist_mat, vector<
     int next_node = this->nodes[next_node_idx];
 
     // Subtract distance to the node to be exchanged
-    this->subtract_distance_from_delta(&delta, dist_mat, prev_node, this->nodes[exchanged_idx], next_node);
+    this->subtract_distance_from_delta(&delta, dist_mat, prev_node, this->nodes[exchanged_idx]);
+    this->subtract_distance_from_delta(&delta, dist_mat, this->nodes[exchanged_idx], next_node);
 
     // Add distance to the new node
-    this->add_distance_to_delta(&delta, dist_mat, prev_node, new_node, next_node);
+    this->add_distance_to_delta(&delta, dist_mat, prev_node, new_node);
+    this->add_distance_to_delta(&delta, dist_mat, new_node, next_node);
 
     return delta;
 }
@@ -196,32 +198,36 @@ int Solution::calculate_delta_intra_route_nodes(vector<std::vector<int>> *dist_m
     int second_prev_node = this->nodes[second_prev_node_idx];
     int second_next_node = this->nodes[second_next_node_idx];
 
-    
-
-    // Handle the case when exchanged nodes
-    // are consecutive
-    if (are_consecutive(first_idx, second_idx))
+    if (second_next_node == first_node)
     {
-        delta += (*dist_mat)[first_idx][second_idx];
-        if (first_next_node_idx == second_idx)
-        {
-            second_prev_node = first_prev_node;
-            first_next_node = second_next_node;
-        }
-        else if (first_prev_node_idx == second_idx)
-        {
-            first_prev_node = second_prev_node;
-            second_next_node = first_next_node;
-        }
+        // Switch first node with second node
+        // if second node preceeds the first one
+        int tmp_node = first_node;
+        first_node = second_node;
+        second_node = tmp_node;
     }
 
-    // Subtract distances
-    this->subtract_distance_from_delta(&delta, dist_mat, first_prev_node, first_node, first_next_node);
-    this->subtract_distance_from_delta(&delta, dist_mat, second_prev_node, second_node, second_next_node);
+    // Subtract distances between first-previous and second-next
+    this->subtract_distance_from_delta(&delta, dist_mat, first_prev_node, first_node);
+    this->subtract_distance_from_delta(&delta, dist_mat, second_node, second_next_node);
 
-    // Add distances
-    this->add_distance_to_delta(&delta, dist_mat, second_prev_node, first_node, second_next_node);
-    this->add_distance_to_delta(&delta, dist_mat, first_prev_node, second_node, first_next_node);
+    // Add distances between firsy-prev - second and first - second-next
+    this->add_distance_to_delta(&delta, dist_mat, first_prev_node, second_node);
+    this->add_distance_to_delta(&delta, dist_mat, first_node, second_next_node);
+
+    if (are_consecutive(first_idx, second_idx))
+    {
+        // This is enough to do for
+        // consecutive nodes
+        return delta;
+    }
+    // Subtract distances between first - first-next and second-prev - second
+    this->subtract_distance_from_delta(&delta, dist_mat, first_node, first_next_node);
+    this->subtract_distance_from_delta(&delta, dist_mat, second_prev_node, second_node);
+
+    // Add distances between second - first-next and first - second-prev
+    this->add_distance_to_delta(&delta, dist_mat, second_node, first_next_node);
+    this->add_distance_to_delta(&delta, dist_mat, first_node, second_prev_node);
 
     return delta;
 }
@@ -249,19 +255,16 @@ int Solution::calculate_delta_intra_route_edges(std::vector<std::vector<int>> *d
 }
 
 void Solution::subtract_distance_from_delta(int *delta, vector<vector<int>> *dist_mat,
-                                            int prev_node, int current_node, int next_node)
+                                            int first_node, int second_node)
 {
-
-    *delta -= (*dist_mat)[prev_node][current_node];
-    *delta -= (*dist_mat)[current_node][next_node];
+    *delta -= (*dist_mat)[first_node][second_node];
 }
 
 void Solution::add_distance_to_delta(int *delta, vector<vector<int>> *dist_mat,
-                                     int prev_node, int current_node, int next_node)
+                                     int first_node, int second_node)
 {
 
-    *delta += (*dist_mat)[prev_node][current_node];
-    *delta += (*dist_mat)[current_node][next_node];
+    *delta += (*dist_mat)[first_node][second_node];
 }
 
 void Solution::print()
