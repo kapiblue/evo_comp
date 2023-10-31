@@ -1,8 +1,10 @@
 #include <string>
+#include <random>
+#include <set>
+
 #include "solution.h"
 #include "problem_solver.h"
 
-#include <set>
 
 #ifndef _LOCALSEARCH_H
 #define _LOCALSEARCH_H
@@ -18,10 +20,14 @@ namespace N
         std::vector<int> iterator1;
         std::vector<int> iterator2;
         std::vector<int> iterator_long;
+        std::random_device rd;
 
     public:
         LocalSearchSolver(std::string instance_filename, double fraction_nodes, Solution initial_solution);
-        void run_steepest(std::string neigh_method, std::string search_method);
+        void set_initial_solution(Solution *new_initial_solution);
+        void write_best_to_csv(std::string filename);
+        int get_best_solution_eval();
+        void run(std::string neigh_method, std::string search_method);
         void find_best_inter_neighbor(int *best_eval, int *exchanged_node, int *new_node, std::string search_method);
         void find_best_intra_neighbor_nodes(int *best_eval, int *first_node_idx, int *second_node_idx, std::string search_method);
         void find_best_intra_neighbor_edges(int *out_delta, int *first_edge_idx, int *second_edge_idx, std::string search_method);

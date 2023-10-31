@@ -101,7 +101,6 @@ bool Solution::are_consecutive(int node1_idx, int node2_idx)
 
 void Solution::exchange_2_edges(int edge1_idx, int edge2_idx)
 {
-    cout << edge1_idx << " " << edge2_idx << endl;
     reverse(this->nodes.begin() + edge1_idx + 1, this->nodes.begin() + edge2_idx + 1);
 }
 

@@ -4,6 +4,7 @@
 #include <algorithm> // sort
 
 #include "problem_solver.h"
+#include "local_search_solver.h"
 
 #ifndef _UTILS_H
 #define _UTILS_H
@@ -28,18 +29,31 @@ T contain(std::vector<T> vec, T value)
 }
 
 template <typename T>
-double mean(std::vector<T> vec)
+double mean(std::vector<T> *vec)
 {
 
-    if (vec.empty())
+    if ((*vec).empty())
     {
         return 0;
     }
     else
     {
-        return std::reduce(vec.begin(), vec.end(), 0.0) / vec.size();
+        return std::reduce((*vec).begin(), (*vec).end(), 0.0) / (*vec).size();
     }
 }
+
+template <typename T>
+void calculate_stats(std::vector<T> *vec, T *min, double *avg, T *max)
+{
+    // Find minimum value
+    *min = *min_element((*vec).begin(), (*vec).end());
+
+    // Find maximum value
+    *max = *max_element((*vec).begin(), (*vec).end());
+
+    *avg = mean(vec);
+}
+
 
 // Returns the indices that would sort an array.
 // Descending order
@@ -61,5 +75,11 @@ std::vector<size_t> argsort(const std::vector<T> &v)
 void measure_generation_time(std::string method,
                              N::ProblemSolver *obj,
                              void (N::ProblemSolver::*func)(std::string));
+
+double measure_generation_time(std::string neigh_method,
+                               std::string search_method,
+                               N::LocalSearchSolver *obj,
+                               void (N::LocalSearchSolver::*func)(std::string,
+                                                                  std::string));
 
 #endif

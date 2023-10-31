@@ -19,7 +19,6 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
     this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
 
     cout << "Init eval " << this->best_sol_evaluation << endl;
-    cout << this->best_solution.get_number_of_nodes();
 
     // Initialize set of all node indexes
     for (int i = 0; i < this->total_nodes; i++)
@@ -40,7 +39,14 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
     this->iterator_long = iterator_long;
 }
 
-void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
+void LocalSearchSolver::set_initial_solution(Solution *new_initial_solution)
+{
+    this->best_solution = *new_initial_solution;
+    this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat,
+                                                             &this->costs);
+}
+
+void LocalSearchSolver::run(string neigh_method, string search_method)
 {
     int current_best_delta = -1;
     int best_inter_delta, best_intra_nodes_delta, best_intra_edges_delta;
@@ -48,32 +54,42 @@ void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
     int arg1, arg2, temp_arg1, temp_arg2;
     string move_type;
 
-    typedef void (LocalSearchSolver::*VoidFunctionFourParams)(int *, int *, int *, string );
+    typedef void (LocalSearchSolver::*VoidFunctionFourParams)(int *, int *, int *, string);
     vector<VoidFunctionFourParams> neigh_methods;
-    neigh_methods = {&LocalSearchSolver::find_best_inter_neighbor, 
-                &LocalSearchSolver::find_best_intra_neighbor_nodes,
-                &LocalSearchSolver::find_best_intra_neighbor_edges};
+    neigh_methods = {&LocalSearchSolver::find_best_inter_neighbor,
+                     &LocalSearchSolver::find_best_intra_neighbor_nodes,
+                     &LocalSearchSolver::find_best_intra_neighbor_edges};
 
     vector<string> move_types = {"inter", "intra_nodes", "intra_edges"};
 
     vector<int> neigh_methods_idxs = {0};
-    
+
     int method_idx = 0;
-    if(neigh_method == "TWO_NODES"){method_idx=1;}
-    if(neigh_method == "TWO_EDGES"){method_idx=2;}
+    if (neigh_method == "TWO_NODES")
+    {
+        method_idx = 1;
+    }
+    if (neigh_method == "TWO_EDGES")
+    {
+        method_idx = 2;
+    }
 
-    if(rand()%2 == 1){neigh_methods_idxs.push_back(method_idx);}
-    else{neigh_methods_idxs.insert(neigh_methods_idxs.begin(), method_idx);}
-
-    
-
+    if (rand() % 2 == 1)
+    {
+        neigh_methods_idxs.push_back(method_idx);
+    }
+    else
+    {
+        neigh_methods_idxs.insert(neigh_methods_idxs.begin(), method_idx);
+    }
 
     while (current_best_delta < 0)
     {
-        
+
         current_best_delta = 0;
 
-        for(auto& i : neigh_methods_idxs){
+        for (auto &i : neigh_methods_idxs)
+        {
             (this->*neigh_methods[i])(&best_inter_delta, &temp_arg1, &temp_arg2, search_method);
             if (best_inter_delta < current_best_delta)
             {
@@ -81,12 +97,13 @@ void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
                 arg2 = temp_arg2;
                 move_type = move_types[i];
                 current_best_delta = best_inter_delta;
-                if(search_method=="GREEDY"){
+                if (search_method == "GREEDY")
+                {
                     break;
                 }
             }
         }
-        
+
         if (current_best_delta >= 0)
         {
             // We don't want to alter the solution
@@ -95,13 +112,13 @@ void LocalSearchSolver::run_steepest(string neigh_method, string search_method)
         }
         this->best_sol_evaluation += current_best_delta;
         apply_move(move_type, &arg1, &arg2);
-        cout << "Move type " << move_type << " Delta " << current_best_delta << endl;
-        cout << arg1 << " " << arg2 << endl;
-        cout << this->best_sol_evaluation << endl;
+        // cout << "Move type " << move_type << " Delta " << current_best_delta << endl;
+        // cout << arg1 << " " << arg2 << endl;
+        // cout << this->best_sol_evaluation << endl;
     }
-    int eval = best_solution.evaluate(&this->dist_mat, &this->costs);
-    cout << "Actual evaluation: " << eval << endl;
-    this->best_solution.print();
+    // int eval = best_solution.evaluate(&this->dist_mat, &this->costs);
+    // cout << "Actual evaluation: " << eval << endl;
+    // this->best_solution.print();
 }
 
 void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *first_node_idx, int *second_node_idx, string search_method)
@@ -112,14 +129,12 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
     int min_node2_idx = -1;
     int delta;
 
-    
-    random_shuffle(this->iterator1.begin(), this->iterator1.end());
-    random_shuffle(this->iterator2.begin(), this->iterator2.end());
+    shuffle(this->iterator1.begin(), this->iterator1.end(), this->rd);
+    shuffle(this->iterator2.begin(), this->iterator2.end(), this->rd);
 
-
-    for (auto& node1_idx : this->iterator1)
+    for (auto &node1_idx : this->iterator1)
     {
-        for (auto& node2_idx : this->iterator2)
+        for (auto &node2_idx : this->iterator2)
         {
             delta = this->best_solution.calculate_delta_intra_route_nodes(&this->dist_mat,
                                                                           node1_idx, node2_idx);
@@ -154,16 +169,17 @@ void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *firs
     int min_edge2_idx = -1;
     int delta;
 
-    random_shuffle(this->iterator1.begin(), this->iterator1.end());
-    random_shuffle(this->iterator2.begin(), this->iterator2.end());
+    shuffle(this->iterator1.begin(), this->iterator1.end(), this->rd);
+    shuffle(this->iterator2.begin(), this->iterator2.end(), this->rd);
 
-    for (auto& edge1_idx : this->iterator1)
+    for (auto &edge1_idx : this->iterator1)
     {
-        for (auto& edge2_idx : this->iterator2)
+        for (auto &edge2_idx : this->iterator2)
         {
-            if(edge1_idx<edge2_idx-1){
+            if (edge1_idx < edge2_idx - 1)
+            {
                 delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
-                                                                          edge1_idx, edge2_idx);
+                                                                              edge1_idx, edge2_idx);
                 if (delta < min_delta)
                 {
                     min_delta = delta;
@@ -199,14 +215,14 @@ void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_
     // this->best_solution.find_not_selected(not_selected, &this->all_nodes);
 
     // random order on indexes for greedy?
-    random_shuffle(this->iterator1.begin(), this->iterator1.end());
-    random_shuffle(this->iterator_long.begin(), this->iterator_long.end());
+    shuffle(this->iterator1.begin(), this->iterator1.end(), this->rd);
+    shuffle(this->iterator_long.begin(), this->iterator_long.end(), this->rd);
 
-    for (auto& j : iterator_long)
+    for (auto &j : iterator_long)
     {
         if (!this->best_solution.contains(j))
         {
-            for (auto& i : iterator1)
+            for (auto &i : iterator1)
             {
                 delta = this->best_solution.calculate_delta_inter_route(&this->dist_mat,
                                                                         &this->costs, i, j);
@@ -236,7 +252,7 @@ void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_
 
 void LocalSearchSolver::apply_move(string move_type, int *arg1, int *arg2)
 {
-    cout << move_type << endl;
+
     if (move_type == "inter")
     {
         this->best_solution.exchange_node_at_idx(*arg1, *arg2);
@@ -249,4 +265,14 @@ void LocalSearchSolver::apply_move(string move_type, int *arg1, int *arg2)
     {
         this->best_solution.exchange_2_edges(*arg1, *arg2);
     }
+}
+
+void LocalSearchSolver::write_best_to_csv(string filename)
+{
+    this->best_solution.write_to_csv(filename);
+}
+
+int LocalSearchSolver::get_best_solution_eval()
+{
+    return this->best_sol_evaluation;
 }

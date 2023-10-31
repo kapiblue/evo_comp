@@ -193,12 +193,9 @@ void ProblemSolver::print_solution_stats(std::vector<int> *evaluations)
 {
 
     // Find minimum value
-    int min = *min_element((*evaluations).begin(), (*evaluations).end());
-
-    // Find maximum value
-    int max = *max_element((*evaluations).begin(), (*evaluations).end());
-
-    double average = mean(*evaluations);
+    int min, max;
+    double average;
+    calculate_stats(evaluations, &min, &average, &max);
 
     cout << "MIN " << min << " AVG " << average << " MAX " << max << endl;
 }
