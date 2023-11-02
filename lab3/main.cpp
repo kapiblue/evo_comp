@@ -24,6 +24,7 @@ void run_experiment()
     srand(time(NULL));
     vector<string> search_methods = {"GREEDY", "STEEPEST"};
     vector<string> neigh_methods = {"TWO_NODES", "TWO_EDGES"};
+    vector<string> init_solutions = {"RANDOM", "GREEDY_CYCLE"};
 
     for (auto instance : instances)
     {
@@ -34,29 +35,37 @@ void run_experiment()
         {
             for (auto neigh_method : neigh_methods)
             {
-                vector<int> best_evaluations;
-                vector<double> generation_times;
-                for (int i = 0; i < 200; i++)
+                for (auto init_solution : init_solutions)
                 {
-                    // GreedyCycle *new_initial_solution = new GreedyCycle();
-                    // new_initial_solution->generate(lss.get_distance_matrix(), lss.get_costs() , i, 100);
+                    vector<int> best_evaluations;
+                    vector<double> generation_times;
+                    for (int i = 0; i < 200; i++)
+                    {
+                        if(init_solution == "RANDOM"){
+                            RandomSolution new_initial_solution = RandomSolution();
+                            new_initial_solution.generate(200, 100);
+                            lss.set_initial_solution(&new_initial_solution);
+                        } else {
+                            GreedyCycle *new_initial_solution = new GreedyCycle();
+                            new_initial_solution->generate(lss.get_distance_matrix(), lss.get_costs() , i, 100);
+                            lss.set_initial_solution(new_initial_solution);
+                        }
 
-                    RandomSolution new_initial_solution = RandomSolution();
-                    new_initial_solution.generate(200, 100);
-                    lss.set_initial_solution(&new_initial_solution);
-                    int generation_time = measure_generation_time(neigh_method, search_method,
-                                                                  &lss, &LocalSearchSolver::run);
-                    generation_times.push_back(generation_time);
-                    int eval = lss.get_best_solution_eval();
-                    best_evaluations.push_back(eval);
+                        
+                        int generation_time = measure_generation_time(neigh_method, search_method,
+                                                                    &lss, &LocalSearchSolver::run);
+                        generation_times.push_back(generation_time);
+                        int eval = lss.get_best_solution_eval();
+                        best_evaluations.push_back(eval);
+                    }
+                    cout << instance << "\n" << search_method << " " << neigh_method << " " << init_solution << endl;
+                    int min_e, max_e;
+                    double min_t, avg_t, max_t, avg_e;
+                    calculate_stats(&best_evaluations, &min_e, &avg_e, &max_e);
+                    cout << "EVAL " << min_e << " " << avg_e << " " << max_e << endl;
+                    calculate_stats(&generation_times, &min_t, &avg_t, &max_t);
+                    cout << "TIME " << min_t << " " << avg_t << " " << max_t << endl;
                 }
-                cout << instance << " " << search_method << " " << neigh_method << endl;
-                int min_e, max_e;
-                double min_t, avg_t, max_t, avg_e;
-                calculate_stats(&best_evaluations, &min_e, &avg_e, &max_e);
-                cout << "EVAL " << min_e << " " << avg_e << " " << max_e << endl;
-                calculate_stats(&generation_times, &min_t, &avg_t, &max_t);
-                cout << "TIME " << min_t << " " << avg_t << " " << max_t << endl;
             }
         }
     }
