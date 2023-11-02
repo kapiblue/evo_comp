@@ -40,6 +40,9 @@ namespace N
         int regret2_greedy_cycle_solution_score(Solution *greedy_cycle_sol);
 
         void print_solution_stats(std::vector<int> *evaluations);
+
+        std::vector<std::vector<int>> get_distance_matrix();
+        std::vector<int> get_costs();
     };
 
 }

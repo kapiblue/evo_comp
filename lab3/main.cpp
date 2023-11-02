@@ -2,6 +2,7 @@
 
 #include "random_solution.h"
 #include "utils.h"
+#include "greedy_cycle.h"
 
 #include <vector>
 #include <iostream>
@@ -37,6 +38,9 @@ void run_experiment()
                 vector<double> generation_times;
                 for (int i = 0; i < 200; i++)
                 {
+                    // GreedyCycle *new_initial_solution = new GreedyCycle();
+                    // new_initial_solution->generate(lss.get_distance_matrix(), lss.get_costs() , i, 100);
+
                     RandomSolution new_initial_solution = RandomSolution();
                     new_initial_solution.generate(200, 100);
                     lss.set_initial_solution(&new_initial_solution);
