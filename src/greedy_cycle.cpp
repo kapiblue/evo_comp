@@ -26,17 +26,17 @@ void GreedyCycle::generate(vector<vector<int>> dist_mat, vector<int> costs, int 
         int edge_to_remove_idx = -1;
         int min_total_cost = numeric_limits<int>::max();
 
-        for (int edge_idx = 0; edge_idx < edges.size(); edge_idx++)
+        for (int node_idx = 0; node_idx < dist_mat.size(); node_idx++)
         {
 
-            int node1 = edges[edge_idx][0];
-            int node2 = edges[edge_idx][1];
-
-            for (int node_idx = 0; node_idx < dist_mat.size(); node_idx++)
+            if (!contain(this->get_nodes(), node_idx))
             {
 
-                if (!contain(this->get_nodes(), node_idx))
+                for (int edge_idx = 0; edge_idx < edges.size(); edge_idx++)
                 {
+
+                    int node1 = edges[edge_idx][0];
+                    int node2 = edges[edge_idx][1];
 
                     int total_cost = dist_mat[node1][node_idx] +
                                      dist_mat[node2][node_idx] -

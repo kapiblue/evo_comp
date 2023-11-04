@@ -22,7 +22,7 @@ int main()
     for (auto instance_filename : instances)
     {
         ProblemSolver ps = ProblemSolver(instance_filename, 0.5);
-        measure_generation_time("REGRET2_GREEDY_CYCLE", &ps, &ProblemSolver::generate_solutions);
+        measure_generation_time("GREEDY_CYCLE", &ps, &ProblemSolver::generate_solutions);
     }
 
     return 0;
