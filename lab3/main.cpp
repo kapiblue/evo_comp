@@ -62,9 +62,9 @@ void run_experiment()
                     int min_e, max_e;
                     double min_t, avg_t, max_t, avg_e;
                     calculate_stats(&best_evaluations, &min_e, &avg_e, &max_e);
-                    cout << "EVAL " << min_e << " " << avg_e << " " << max_e << endl;
+                    cout << "EVAL " << avg_e << " (" << min_e << "-" << max_e << ")" << endl;
                     calculate_stats(&generation_times, &min_t, &avg_t, &max_t);
-                    cout << "TIME " << min_t << " " << avg_t << " " << max_t << endl;
+                    cout << "TIME " << avg_t << " (" << min_t << "-" << max_t << ")" << endl;
                 }
             }
         }
