@@ -20,12 +20,6 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
 
     cout << "Init eval " << this->best_sol_evaluation << endl;
 
-    // Initialize set of all node indexes
-    for (int i = 0; i < this->total_nodes; i++)
-    {
-        this->all_nodes.insert(i);
-    }
-
     vector<int> iterator1(this->best_solution.get_number_of_nodes());
     iota(iterator1.begin(), iterator1.end(), 0);
     this->iterator1 = iterator1;
@@ -123,11 +117,9 @@ void LocalSearchSolver::run(string neigh_method, string search_method)
 
 void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *first_node_idx, int *second_node_idx, string search_method)
 {
-    int nodes_number = this->best_solution.get_number_of_nodes();
     int min_delta = 0;
     int min_node1_idx = -1;
     int min_node2_idx = -1;
-    int delta;
 
     shuffle(this->iterator1.begin(), this->iterator1.end(), this->rd);
     shuffle(this->iterator2.begin(), this->iterator2.end(), this->rd);
@@ -136,7 +128,7 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
     {
         for (auto &node2_idx : this->iterator2)
         {
-            delta = this->best_solution.calculate_delta_intra_route_nodes(&this->dist_mat,
+            int delta = this->best_solution.calculate_delta_intra_route_nodes(&this->dist_mat,
                                                                           node1_idx, node2_idx);
             if (delta < min_delta)
             {
@@ -163,11 +155,9 @@ void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *firs
 {
     // We assume edge 0 to connect nodes[0] with nodes[1]
     // Last edge is between last node and the first node
-    int edges_number = this->best_solution.get_number_of_nodes();
     int min_delta = 0;
     int min_edge1_idx = -1;
     int min_edge2_idx = -1;
-    int delta;
 
     shuffle(this->iterator1.begin(), this->iterator1.end(), this->rd);
     shuffle(this->iterator2.begin(), this->iterator2.end(), this->rd);
@@ -178,7 +168,7 @@ void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *firs
         {
             if (edge1_idx < edge2_idx - 1)
             {
-                delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
+                int delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
                                                                               edge1_idx, edge2_idx);
                 if (delta < min_delta)
                 {
@@ -205,16 +195,11 @@ void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_
 {
     // Finds best neighbor by exchanging some selected node
     // with a not selected node
-    int delta;
     int min_delta = 0;
     int min_exchanged_idx = -1;
     int min_new_node = -1;
 
-    // Doesn't work for now
-    // set<int> not_selected;
-    // this->best_solution.find_not_selected(not_selected, &this->all_nodes);
 
-    // random order on indexes for greedy?
     shuffle(this->iterator1.begin(), this->iterator1.end(), this->rd);
     shuffle(this->iterator_long.begin(), this->iterator_long.end(), this->rd);
 
@@ -224,7 +209,7 @@ void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_
         {
             for (auto &i : iterator1)
             {
-                delta = this->best_solution.calculate_delta_inter_route(&this->dist_mat,
+                int delta = this->best_solution.calculate_delta_inter_route(&this->dist_mat,
                                                                         &this->costs, i, j);
 
                 if (delta < min_delta)
