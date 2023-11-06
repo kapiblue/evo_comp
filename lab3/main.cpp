@@ -53,7 +53,7 @@ void run_experiment()
 
                         
                         int generation_time = measure_generation_time(neigh_method, search_method,
-                                                                    &lss, &LocalSearchSolver::run);
+                                                                    &lss, &LocalSearchSolver::run_basic);
                         generation_times.push_back(generation_time);
                         int eval = lss.get_best_solution_eval();
                         best_evaluations.push_back(eval);

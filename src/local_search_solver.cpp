@@ -37,6 +37,33 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
     vector<int> iterator_long(this->total_nodes);
     iota(iterator_long.begin(), iterator_long.end(), 0);
     this->iterator_long = iterator_long;
+
+    this->construct_candidate_nodes();
+}
+
+void LocalSearchSolver::construct_candidate_nodes(){
+    vector<vector<int>> dist_mat = this->get_distance_matrix();
+    vector<int> costs = this->get_costs();
+    for(int node_idx=0; node_idx<this->total_nodes; node_idx++){
+        vector<int> single_node_candidates(this->total_nodes);
+        iota(single_node_candidates.begin(), single_node_candidates.end(), 0);
+        single_node_candidates.erase(single_node_candidates.begin() + node_idx);
+
+        sort(single_node_candidates.begin(), single_node_candidates.end(), [&](int a, int b){
+            int a_value = dist_mat[node_idx][a] + costs[a];
+            int b_value = dist_mat[node_idx][b] + costs[b];
+            return a_value<b_value;
+        });
+
+        single_node_candidates = {single_node_candidates.begin(), single_node_candidates.begin() + 10};
+        this->candidate_nodes.push_back(single_node_candidates);
+    }
+    // for(auto& row: this->candidate_nodes){
+    //     for(auto& x: row){
+    //         cout<<x<<" ";
+    //     }
+    //     cout<<endl;
+    // }
 }
 
 void LocalSearchSolver::set_initial_solution(Solution *new_initial_solution)
@@ -46,7 +73,7 @@ void LocalSearchSolver::set_initial_solution(Solution *new_initial_solution)
                                                              &this->costs);
 }
 
-void LocalSearchSolver::run(string neigh_method, string search_method)
+void LocalSearchSolver::run_basic(string neigh_method, string search_method)
 {
     int current_best_delta = -1;
     int best_inter_delta, best_intra_nodes_delta, best_intra_edges_delta;
