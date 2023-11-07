@@ -30,8 +30,6 @@ void run_experiment()
         RandomSolution initial_solution = RandomSolution();
         initial_solution.generate(200, 100);
         LocalSearchSolver lss = LocalSearchSolver(instance, 0.5, initial_solution);
-
-        break;
         
         vector<int> best_evaluations;
         vector<double> generation_times;
@@ -40,9 +38,8 @@ void run_experiment()
             RandomSolution new_initial_solution = RandomSolution();
             new_initial_solution.generate(200, 100);
             lss.set_initial_solution(&new_initial_solution);
-        
             int generation_time = measure_generation_time(neigh_method, search_method,
-                                                        &lss, &LocalSearchSolver::run_basic);
+                                                        &lss, &LocalSearchSolver::run_candidates);
             generation_times.push_back(generation_time);
             int eval = lss.get_best_solution_eval();
             best_evaluations.push_back(eval);
