@@ -73,17 +73,3 @@ void measure_generation_time(std::string method,
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     std::cout << "Generation time = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
 }
-/**
- * Measures execution time of a local search run in microseconds.
- */
-double measure_generation_time(std::string neigh_method,
-                               std::string search_method,
-                               N::LocalSearchSolver *obj,
-                               void (N::LocalSearchSolver::*func)(std::string,
-                                                                  std::string))
-{
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    (obj->*func)(neigh_method, search_method);
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-}

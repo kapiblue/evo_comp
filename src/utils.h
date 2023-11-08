@@ -54,7 +54,6 @@ void calculate_stats(std::vector<T> *vec, T *min, double *avg, T *max)
     *avg = mean(vec);
 }
 
-
 // Returns the indices that would sort an array.
 // Descending order
 template <typename T>
@@ -76,10 +75,20 @@ void measure_generation_time(std::string method,
                              N::ProblemSolver *obj,
                              void (N::ProblemSolver::*func)(std::string));
 
+/**
+ * Measures execution time of a local search run in microseconds.
+ */
+template <typename T>
 double measure_generation_time(std::string neigh_method,
                                std::string search_method,
-                               N::LocalSearchSolver *obj,
-                               void (N::LocalSearchSolver::*func)(std::string,
-                                                                  std::string));
+                               T *obj,
+                               void (T::*func)(std::string,
+                                               std::string))
+{
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    (obj->*func)(neigh_method, search_method);
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+}
 
 #endif
