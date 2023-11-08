@@ -28,6 +28,7 @@ void CMLocalSearchSolver::run_candidates(string neigh_method, string search_meth
 
     int arg1, arg2, temp_arg1, temp_arg2;
     string move_type;
+    string direction, tmp_direction;
 
     while (current_best_delta < 0)
     {
@@ -40,7 +41,15 @@ void CMLocalSearchSolver::run_candidates(string neigh_method, string search_meth
             move_type = "intra_edges";
             current_best_delta = best_intra_edges_delta;
         }
-
+        this->find_best_neighbor_nodes_from_candidates(&best_inter_delta, &temp_arg1, &temp_arg2, &tmp_direction, search_method);
+        if (best_inter_delta < current_best_delta)
+        {
+            arg1 = temp_arg1;
+            arg2 = temp_arg2;
+            move_type = "inter_nodes";
+            direction = tmp_direction;
+            current_best_delta = best_inter_delta;
+        }
         if (current_best_delta >= 0)
         {
             // We don't want to alter the solution
@@ -49,7 +58,7 @@ void CMLocalSearchSolver::run_candidates(string neigh_method, string search_meth
         }
         // cout << "Move type " << move_type << " Delta " << current_best_delta << endl;
         // cout << arg1 << " " << arg2 << endl;
-        this->apply_move(move_type, arg1, arg2);
+        this->apply_move(move_type, arg1, arg2, direction);
         this->best_sol_evaluation += current_best_delta;
         // cout << this->best_sol_evaluation << endl;
         // this->best_solution.print();
@@ -88,6 +97,7 @@ void CMLocalSearchSolver::find_best_neighbor_edges_from_candidates(int *out_delt
                     min_edge1_idx = edge1_idx;
                     min_edge2_idx = cand_idx;
                 }
+                //tutaj na pewno else if? a nie if?
                 else if (delta_prev < min_delta && edge1_prev_idx < cand_prev_idx - 1)
                 {
                     min_delta = delta_prev;
@@ -104,12 +114,54 @@ void CMLocalSearchSolver::find_best_neighbor_edges_from_candidates(int *out_delt
     *second_edge_idx = min_edge2_idx;
 }
 
-void CMLocalSearchSolver::apply_move(string move_type, int arg1, int arg2)
+void CMLocalSearchSolver::find_best_neighbor_nodes_from_candidates(int *out_delta, int *first_node_idx,
+                                                                   int *second_node, string *direction ,string search_method)
 {
 
-    if (move_type == "inter")
+    int min_delta = 0;
+    int min_node1_idx = -1;
+    int min_node2 = -1;
+    int delta;
+    string tmp_direction;
+
+    for (auto &node1_idx : this->iterator1)
     {
-        this->best_solution.exchange_node_at_idx(arg1, arg2);
+        for (auto &cand_node : this->candidate_nodes[node1_idx])
+        {
+            if (!this->best_solution.contains(cand_node))
+            {
+                delta =  this->best_solution.calculate_delta_inter_route_nodes_candidates(&this->dist_mat, &this->costs, node1_idx, cand_node, "previous");
+                if (delta < min_delta)
+                {
+                    min_delta = delta;
+                    min_node1_idx = node1_idx;
+                    min_node2 = cand_node;
+                    tmp_direction = "previous";
+                }
+                delta = this->best_solution.calculate_delta_inter_route_nodes_candidates(&this->dist_mat, &this->costs, node1_idx, cand_node, "next");
+                if (delta < min_delta)
+                {
+                    min_delta = delta;
+                    min_node1_idx = node1_idx;
+                    min_node2 = cand_node;
+                    tmp_direction = "next";
+                }
+            }
+        }
+    }
+
+    *out_delta = min_delta;
+    *first_node_idx = min_node1_idx;
+    *second_node = min_node2;
+    *direction = tmp_direction;
+}
+
+void CMLocalSearchSolver::apply_move(string move_type, int arg1, int arg2, string direction)
+{
+
+    if (move_type == "inter_node")
+    {
+        this->best_solution.exchange_nodes_candidate(arg1, arg2, direction);
     }
     else if (move_type == "intra_edges")
     {

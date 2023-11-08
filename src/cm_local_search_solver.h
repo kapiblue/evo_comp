@@ -23,7 +23,9 @@ namespace N
         void construct_node_idxs_lookup();
         void find_best_neighbor_edges_from_candidates(int *out_delta, int *first_edge_idx,
                                                       int *second_edge_idx, std::string search_method);
-        void apply_move(std::string move_type, int arg1, int arg2);
+        void find_best_neighbor_nodes_from_candidates(int *out_delta, int *first_node_idx,
+                                                    int *second_node, std::string *direction , std::string search_method);
+        void apply_move(std::string move_type, int arg1, int arg2, std::string directio);
         int get_solution_index(int node);
     };
 
