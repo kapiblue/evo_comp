@@ -2,6 +2,7 @@
 #include <string>
 #include <numeric>   // iota
 #include <algorithm> // sort
+#include <chrono>
 
 #include "problem_solver.h"
 #include "local_search_solver.h"
@@ -85,9 +86,9 @@ double measure_generation_time(std::string neigh_method,
                                void (T::*func)(std::string,
                                                std::string))
 {
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    auto begin = std::chrono::steady_clock::now();
     (obj->*func)(neigh_method, search_method);
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    auto end = std::chrono::steady_clock::now();
     return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 }
 

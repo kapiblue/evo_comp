@@ -159,7 +159,7 @@ void CMLocalSearchSolver::find_best_neighbor_nodes_from_candidates(int *out_delt
 void CMLocalSearchSolver::apply_move(string move_type, int arg1, int arg2, string direction)
 {
 
-    if (move_type == "inter_node")
+    if (move_type == "inter_nodes")
     {
         this->best_solution.exchange_nodes_candidate(arg1, arg2, direction);
     }
@@ -222,4 +222,5 @@ int CMLocalSearchSolver::get_solution_index(int node)
             return i;
         }
     }
+    return -1;
 }
