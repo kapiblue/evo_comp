@@ -28,12 +28,11 @@ void CMLocalSearchSolver::run_candidates(string neigh_method, string search_meth
 
     int arg1, arg2, temp_arg1, temp_arg2;
     string move_type;
-    string direction, tmp_direction;
 
     while (current_best_delta < 0)
     {
         current_best_delta = 0;
-        this->find_best_neighbor_edges_from_candidates(&best_intra_edges_delta, &temp_arg1, &temp_arg2, search_method);
+        this->find_best_neighbor_edges_from_candidates(&best_intra_edges_delta, &temp_arg1, &temp_arg2);
         if (best_intra_edges_delta < current_best_delta)
         {
             arg1 = temp_arg1;
@@ -41,13 +40,12 @@ void CMLocalSearchSolver::run_candidates(string neigh_method, string search_meth
             move_type = "intra_edges";
             current_best_delta = best_intra_edges_delta;
         }
-        this->find_best_neighbor_nodes_from_candidates(&best_inter_delta, &temp_arg1, &temp_arg2, &tmp_direction, search_method);
+        this->find_best_neighbor_nodes_from_candidates(&best_inter_delta, &temp_arg1, &temp_arg2);
         if (best_inter_delta < current_best_delta)
         {
             arg1 = temp_arg1;
             arg2 = temp_arg2;
             move_type = "inter_nodes";
-            direction = tmp_direction;
             current_best_delta = best_inter_delta;
         }
         if (current_best_delta >= 0)
@@ -58,11 +56,10 @@ void CMLocalSearchSolver::run_candidates(string neigh_method, string search_meth
         }
         // cout << "Move type " << move_type << " Delta " << current_best_delta << endl;
         // cout << arg1 << " " << arg2 << endl;
-        this->apply_move(move_type, arg1, arg2, direction);
+        this->apply_move(&move_type, arg1, arg2);
         this->best_sol_evaluation += current_best_delta;
-        // cout << this->best_sol_evaluation << endl;
+        //cout << this->best_sol_evaluation << endl;
         // this->best_solution.print();
-        // cout << this->best_solution.evaluate(&this->dist_mat, &this->costs) << endl;
     }
     // int eval = best_solution.evaluate(&this->dist_mat, &this->costs);
     // cout << "Actual evaluation: " << eval << endl;
@@ -70,7 +67,7 @@ void CMLocalSearchSolver::run_candidates(string neigh_method, string search_meth
 }
 
 void CMLocalSearchSolver::find_best_neighbor_edges_from_candidates(int *out_delta, int *first_edge_idx,
-                                                                   int *second_edge_idx, string search_method)
+                                                                   int *second_edge_idx)
 {
     // We assume edge 0 to connect nodes[0] with nodes[1]
     // Last edge is between last node and the first node
@@ -97,8 +94,7 @@ void CMLocalSearchSolver::find_best_neighbor_edges_from_candidates(int *out_delt
                     min_edge1_idx = edge1_idx;
                     min_edge2_idx = cand_idx;
                 }
-                //tutaj na pewno else if? a nie if?
-                else if (delta_prev < min_delta && edge1_prev_idx < cand_prev_idx - 1)
+                if (delta_prev < min_delta && edge1_prev_idx < cand_prev_idx - 1)
                 {
                     min_delta = delta_prev;
                     min_edge1_idx = edge1_prev_idx;
@@ -107,22 +103,20 @@ void CMLocalSearchSolver::find_best_neighbor_edges_from_candidates(int *out_delt
             }
         }
     }
-    // cout << "MIN DELTA" << min_delta << endl;
-    // cout << min_delta << " " << min_edge1_idx << " " << min_edge2_idx << endl;
     *out_delta = min_delta;
     *first_edge_idx = min_edge1_idx;
     *second_edge_idx = min_edge2_idx;
 }
 
 void CMLocalSearchSolver::find_best_neighbor_nodes_from_candidates(int *out_delta, int *first_node_idx,
-                                                                   int *second_node, string *direction ,string search_method)
+                                                                   int *second_node)
 {
-
     int min_delta = 0;
     int min_node1_idx = -1;
     int min_node2 = -1;
     int delta;
-    string tmp_direction;
+    // Store idx of the node to be removed
+    int removed_idx;
 
     for (auto &node1_idx : this->iterator1)
     {
@@ -130,21 +124,25 @@ void CMLocalSearchSolver::find_best_neighbor_nodes_from_candidates(int *out_delt
         {
             if (!this->best_solution.contains(cand_node))
             {
-                delta =  this->best_solution.calculate_delta_inter_route_nodes_candidates(&this->dist_mat, &this->costs, node1_idx, cand_node, "previous");
+                delta = this->best_solution.calculate_delta_inter_route_nodes_candidates(&this->dist_mat, &this->costs,
+                                                                                         node1_idx, cand_node,
+                                                                                         &removed_idx,
+                                                                                         "previous");
                 if (delta < min_delta)
                 {
                     min_delta = delta;
-                    min_node1_idx = node1_idx;
+                    min_node1_idx = removed_idx;
                     min_node2 = cand_node;
-                    tmp_direction = "previous";
                 }
-                delta = this->best_solution.calculate_delta_inter_route_nodes_candidates(&this->dist_mat, &this->costs, node1_idx, cand_node, "next");
+                delta = this->best_solution.calculate_delta_inter_route_nodes_candidates(&this->dist_mat, &this->costs,
+                                                                                         node1_idx, cand_node,
+                                                                                         &removed_idx,
+                                                                                         "next");
                 if (delta < min_delta)
                 {
                     min_delta = delta;
-                    min_node1_idx = node1_idx;
+                    min_node1_idx = removed_idx;
                     min_node2 = cand_node;
-                    tmp_direction = "next";
                 }
             }
         }
@@ -153,21 +151,60 @@ void CMLocalSearchSolver::find_best_neighbor_nodes_from_candidates(int *out_delt
     *out_delta = min_delta;
     *first_node_idx = min_node1_idx;
     *second_node = min_node2;
-    *direction = tmp_direction;
 }
 
-void CMLocalSearchSolver::apply_move(string move_type, int arg1, int arg2, string direction)
+void CMLocalSearchSolver::apply_move(string *move_type, int arg1, int arg2)
 {
 
-    if (move_type == "inter_nodes")
+    if (*move_type == "inter_nodes")
     {
-        this->best_solution.exchange_nodes_candidate(arg1, arg2, direction);
+        this->best_solution.exchange_node_at_idx(arg1, arg2);
+        update_node_lookup_inter(arg1, arg2);
     }
-    else if (move_type == "intra_edges")
+    else if (*move_type == "intra_edges")
     {
         this->best_solution.exchange_2_edges(arg1, arg2);
-        // update_node_lookup_edges();
+        update_node_lookup_intra_edges(arg1, arg2);
     }
+}
+
+void CMLocalSearchSolver::update_node_lookup_inter(int removed_idx,
+                                                   int new_node)
+{
+    int removed_node = this->best_solution.get_nodes()[removed_idx];
+    // Remove node from lookup
+    node_lookup.erase(removed_node);
+    // Assign new node with the same index of the solution
+    node_lookup[new_node] = removed_idx;
+}
+
+void CMLocalSearchSolver::update_node_lookup_intra_edges(int edge1_idx,
+                                                         int edge2_idx)
+{
+    for (int i = edge1_idx + 1; i < edge2_idx + 1; ++i)
+    {
+        node_lookup[this->best_solution.get_nodes()[i]] = i;
+    }
+}
+
+/*
+Constructs a node lookup structure for fast verification
+at what index the node is in the solution
+*/
+void CMLocalSearchSolver::construct_node_idxs_lookup()
+{
+    map<int, int> node_lookup;
+    vector<int> nodes = this->best_solution.get_nodes();
+    for (int i = 0; i < this->best_solution.get_number_of_nodes(); ++i)
+    {
+        node_lookup[nodes[i]] = i;
+    }
+    this->node_lookup = node_lookup;
+}
+
+int CMLocalSearchSolver::get_solution_index(int node)
+{
+    return this->node_lookup[node];
 }
 
 void CMLocalSearchSolver::construct_candidate_nodes()
@@ -189,38 +226,4 @@ void CMLocalSearchSolver::construct_candidate_nodes()
         single_node_candidates = {single_node_candidates.begin(), single_node_candidates.begin() + 10};
         this->candidate_nodes.push_back(single_node_candidates);
     }
-    // for(auto& row: this->candidate_nodes){
-    //     for(auto& x: row){
-    //         cout<<x<<" ";
-    //     }
-    //     cout<<endl;
-    // }
-}
-
-/*
-Constructs a node lookup structure for fast verification
-at what index the node is in the solution
-*/
-void CMLocalSearchSolver::construct_node_idxs_lookup()
-{
-    map<int, int> node_lookup;
-    vector<int> nodes = this->best_solution.get_nodes();
-    for (int i = 0; i < this->best_solution.get_number_of_nodes(); ++i)
-    {
-        node_lookup[nodes[i]] = i;
-    }
-    this->node_lookup = node_lookup;
-}
-
-int CMLocalSearchSolver::get_solution_index(int node)
-{
-    vector<int> nodes = this->best_solution.get_nodes();
-    for (int i = 0; i < this->best_solution.get_number_of_nodes(); ++i)
-    {
-        if (nodes[i] == node)
-        {
-            return i;
-        }
-    }
-    return -1;
 }

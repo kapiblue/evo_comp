@@ -35,7 +35,6 @@ namespace N
         void exchange_2_nodes(int node1_idx, int node2_idx);
         bool are_consecutive(int node1_idx, int node2_idx);
         void exchange_2_edges(int edge1_idx, int edge2_idx);
-        void exchange_nodes_candidate(int arg1, int arg2, std::string direction);
 
         int evaluate(std::vector<std::vector<int>> *dist_mat,
                      std::vector<int> *costs);
@@ -49,9 +48,12 @@ namespace N
                                         int exchange_idx, int new_node);
         int calculate_delta_intra_route_nodes(std::vector<std::vector<int>> *dist_mat,
                                               int first_idx, int second_idx);
-        int calculate_delta_inter_route_nodes_candidates(std::vector<std::vector<int>> *dist_mat, std::vector<int> *costs,
-                                                int first_idx,
-                                                int second_idx, std::string direction);
+        int calculate_delta_inter_route_nodes_candidates(std::vector<std::vector<int>> *dist_mat,
+                                                         std::vector<int> *costs,
+                                                         int first_idx,
+                                                         int cand_node,
+                                                         int *removed_idx,
+                                                         std::string direction);
         int calculate_delta_intra_route_edges(std::vector<std::vector<int>> *dist_mat,
                                               int first_edge_idx, int second_edge_idx);
         void subtract_distance_from_delta(int *delta, std::vector<std::vector<int>> *dist_mat,

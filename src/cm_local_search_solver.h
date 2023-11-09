@@ -19,14 +19,20 @@ namespace N
     public:
         CMLocalSearchSolver(std::string instance_filename, double fraction_nodes, Solution initial_solution);
         void run_candidates(std::string neigh_method, std::string search_method);
+
         void construct_candidate_nodes();
         void construct_node_idxs_lookup();
+
         void find_best_neighbor_edges_from_candidates(int *out_delta, int *first_edge_idx,
-                                                      int *second_edge_idx, std::string search_method);
+                                                      int *second_edge_idx);
         void find_best_neighbor_nodes_from_candidates(int *out_delta, int *first_node_idx,
-                                                    int *second_node, std::string *direction , std::string search_method);
-        void apply_move(std::string move_type, int arg1, int arg2, std::string directio);
+                                                      int *second_node);
+
+        void apply_move(std::string *move_type, int arg1, int arg2);
         int get_solution_index(int node);
+
+        void update_node_lookup_inter(int removed_idx, int new_node);
+        void update_node_lookup_intra_edges(int edge1_idx, int edge2_idx);
     };
 
 }
