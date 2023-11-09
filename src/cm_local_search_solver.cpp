@@ -58,8 +58,8 @@ void CMLocalSearchSolver::run_candidates(string neigh_method, string search_meth
         // cout << arg1 << " " << arg2 << endl;
         this->apply_move(&move_type, arg1, arg2);
         this->best_sol_evaluation += current_best_delta;
-        //cout << this->best_sol_evaluation << endl;
-        // this->best_solution.print();
+        // cout << this->best_sol_evaluation << endl;
+        //  this->best_solution.print();
     }
     // int eval = best_solution.evaluate(&this->dist_mat, &this->costs);
     // cout << "Actual evaluation: " << eval << endl;
@@ -82,23 +82,29 @@ void CMLocalSearchSolver::find_best_neighbor_edges_from_candidates(int *out_delt
             if (this->best_solution.contains(cand_node))
             {
                 int cand_idx = this->get_solution_index(cand_node);
-                int delta_next = this->best_solution.calculate_delta_intra_route_edges(
-                    &this->dist_mat, edge1_idx, cand_idx);
+                if (edge1_idx < cand_idx - 1)
+                {
+                    int delta_next = this->best_solution.calculate_delta_intra_route_edges(
+                        &this->dist_mat, edge1_idx, cand_idx);
+                    if (delta_next < min_delta)
+                    {
+                        min_delta = delta_next;
+                        min_edge1_idx = edge1_idx;
+                        min_edge2_idx = cand_idx;
+                    }
+                }
                 int edge1_prev_idx = this->best_solution.get_prev_node_idx(edge1_idx);
                 int cand_prev_idx = this->best_solution.get_prev_node_idx(cand_idx);
-                int delta_prev = this->best_solution.calculate_delta_intra_route_edges(
-                    &this->dist_mat, edge1_prev_idx, cand_prev_idx);
-                if (delta_next < min_delta && edge1_idx < cand_idx - 1)
+                if (edge1_prev_idx < cand_prev_idx - 1)
                 {
-                    min_delta = delta_next;
-                    min_edge1_idx = edge1_idx;
-                    min_edge2_idx = cand_idx;
-                }
-                if (delta_prev < min_delta && edge1_prev_idx < cand_prev_idx - 1)
-                {
-                    min_delta = delta_prev;
-                    min_edge1_idx = edge1_prev_idx;
-                    min_edge2_idx = cand_prev_idx;
+                    int delta_prev = this->best_solution.calculate_delta_intra_route_edges(
+                        &this->dist_mat, edge1_prev_idx, cand_prev_idx);
+                    if (delta_prev < min_delta)
+                    {
+                        min_delta = delta_prev;
+                        min_edge1_idx = edge1_prev_idx;
+                        min_edge2_idx = cand_prev_idx;
+                    }
                 }
             }
         }
