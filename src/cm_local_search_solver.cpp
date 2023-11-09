@@ -14,10 +14,13 @@
 using namespace std;
 using namespace N;
 
-CMLocalSearchSolver::CMLocalSearchSolver(string instance_filename, double fraction_nodes, Solution initial_solution)
+CMLocalSearchSolver::CMLocalSearchSolver(string instance_filename,
+                                         double fraction_nodes,
+                                         Solution initial_solution,
+                                         int n_candidates)
     : LocalSearchSolver(instance_filename, fraction_nodes, initial_solution)
 {
-    this->construct_candidate_nodes();
+    this->construct_candidate_nodes(n_candidates);
     this->construct_node_idxs_lookup();
 }
 
@@ -213,7 +216,7 @@ int CMLocalSearchSolver::get_solution_index(int node)
     return this->node_lookup[node];
 }
 
-void CMLocalSearchSolver::construct_candidate_nodes()
+void CMLocalSearchSolver::construct_candidate_nodes(int n_candidates)
 {
     vector<vector<int>> dist_mat = this->get_distance_matrix();
     vector<int> costs = this->get_costs();
@@ -229,7 +232,8 @@ void CMLocalSearchSolver::construct_candidate_nodes()
             int b_value = dist_mat[node_idx][b] + costs[b];
             return a_value<b_value; });
 
-        single_node_candidates = {single_node_candidates.begin(), single_node_candidates.begin() + 10};
+        single_node_candidates = {single_node_candidates.begin(),
+                                  single_node_candidates.begin() + n_candidates};
         this->candidate_nodes.push_back(single_node_candidates);
     }
 }

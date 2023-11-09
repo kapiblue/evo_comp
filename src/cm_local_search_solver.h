@@ -17,10 +17,13 @@ namespace N
         std::map<int, int> node_lookup;
 
     public:
-        CMLocalSearchSolver(std::string instance_filename, double fraction_nodes, Solution initial_solution);
+        CMLocalSearchSolver(std::string instance_filename,
+                            double fraction_nodes,
+                            Solution initial_solution,
+                            int n_candidates);
         void run_candidates(std::string neigh_method, std::string search_method);
 
-        void construct_candidate_nodes();
+        void construct_candidate_nodes(int n_candidates);
         void construct_node_idxs_lookup();
 
         void find_best_neighbor_edges_from_candidates(int *out_delta, int *first_edge_idx,
