@@ -29,7 +29,7 @@ void run_experiment()
     {
         RandomSolution initial_solution = RandomSolution();
         initial_solution.generate(200, 100);
-        CMLocalSearchSolver lss = CMLocalSearchSolver(instance, 0.5, initial_solution, 5);
+        CMLocalSearchSolver lss = CMLocalSearchSolver(instance, 0.5, initial_solution, 10);
         
         vector<int> best_evaluations;
         vector<double> generation_times;
