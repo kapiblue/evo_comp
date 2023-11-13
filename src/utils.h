@@ -92,4 +92,17 @@ double measure_generation_time(std::string neigh_method,
     return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 }
 
+/**
+ * Measures execution time of a local search run in microseconds.
+ */
+template <typename T>
+double measure_generation_time(T *obj,
+                               void (T::*func)())
+{
+    auto begin = std::chrono::steady_clock::now();
+    (obj->*func)();
+    auto end = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+}
+
 #endif
