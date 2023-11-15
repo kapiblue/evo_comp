@@ -31,7 +31,7 @@ void run_experiment()
 
         vector<int> best_evaluations;
         vector<double> generation_times;
-        for (int i = 0; i < 200; i++)
+        for (int i = 0; i < 1; i++)
         {
             RandomSolution new_initial_solution = RandomSolution();
             new_initial_solution.generate(200, 100);
@@ -42,9 +42,9 @@ void run_experiment()
             int eval = lss.get_best_solution_eval();
             best_evaluations.push_back(eval);
         }
-        string dir = "lab4/solutions/" + instance.substr(14, 4) + "/";
-        string filename = "plot.csv";
-        lss.write_best_to_csv(dir + filename);
+        // string dir = "lab4/solutions/" + instance.substr(14, 4) + "/";
+        // string filename = "plot.csv";
+        // lss.write_best_to_csv(dir + filename);
         int min_e, max_e;
         double min_t, avg_t, max_t, avg_e;
         calculate_stats(&best_evaluations, &min_e, &avg_e, &max_e);

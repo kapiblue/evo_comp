@@ -51,6 +51,11 @@ set<int> Solution::get_selected()
     return this->selected;
 }
 
+int Solution::get_node_at_idx(int node_idx)
+{
+    return this->nodes[node_idx];
+}
+
 int Solution::get_next_node_idx(int node_idx)
 {
     return (node_idx + 1) % this->n_nodes;
@@ -101,6 +106,10 @@ bool Solution::are_consecutive(int node1_idx, int node2_idx)
 
 void Solution::exchange_2_edges(int edge1_idx, int edge2_idx)
 {
+    if (edge2_idx < edge1_idx)
+    {
+        swap(edge1_idx, edge2_idx);
+    }
     reverse(this->nodes.begin() + edge1_idx + 1, this->nodes.begin() + edge2_idx + 1);
 }
 

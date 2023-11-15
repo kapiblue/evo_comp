@@ -28,6 +28,7 @@ namespace N
 
         int get_number_of_nodes();
         std::set<int> get_selected();
+        int get_node_at_idx(int node_idx);
         int get_next_node_idx(int node_idx);
         int get_prev_node_idx(int node_idx);
         void find_not_selected(std::set<int> not_selected, std::set<int> *all_nodes);

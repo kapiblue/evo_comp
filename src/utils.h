@@ -3,6 +3,7 @@
 #include <numeric>   // iota
 #include <algorithm> // sort
 #include <chrono>
+#include <iostream>
 
 #include "problem_solver.h"
 #include "local_search_solver.h"
@@ -103,6 +104,16 @@ double measure_generation_time(T *obj,
     (obj->*func)();
     auto end = std::chrono::steady_clock::now();
     return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+}
+
+template <typename T>
+void print_vector(const std::vector<T> &vec)
+{
+    for (T i : vec)
+    {
+        std::cout << i << ' ';
+    }
+    std::cout << std::endl;
 }
 
 #endif

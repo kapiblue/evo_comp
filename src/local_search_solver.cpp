@@ -2,6 +2,7 @@
 #include "solution.h"
 
 #include <string>
+#include <cstdlib>
 #include <set>
 #include <iostream>
 #include <limits>
@@ -170,7 +171,6 @@ void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *firs
 {
     // We assume edge 0 to connect nodes[0] with nodes[1]
     // Last edge is between last node and the first node
-    int edges_number = this->best_solution.get_number_of_nodes();
     int min_delta = 0;
     int min_edge1_idx = -1;
     int min_edge2_idx = -1;
@@ -186,7 +186,7 @@ void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *firs
     {
         for (auto &edge2_idx : this->iterator2)
         {
-            if (edge1_idx < edge2_idx - 1)
+            if (abs(edge1_idx - edge2_idx) > 1)
             {
                 delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
                                                                               edge1_idx, edge2_idx);
