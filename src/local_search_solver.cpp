@@ -34,15 +34,11 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
     this->iterator_long = iterator_long;
 }
 
-void LocalSearchSolver::set_initial_solution(Solution new_initial_solution2)
+void LocalSearchSolver::set_initial_solution(Solution *new_initial_solution)
 {
-    RandomSolution new_initial_solution = RandomSolution();
-    new_initial_solution.generate(200, 100);
-    this->best_solution = new_initial_solution;
-    this->best_solution.set_nodes(new_initial_solution.get_nodes());
-    this->best_solution.set_selected(new_initial_solution.get_selected());
+    
+    this->best_solution = *new_initial_solution;
     this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
-    cout << "Init eval " << this->best_sol_evaluation << endl;
 }
 
 void LocalSearchSolver::run_basic(string neigh_method, string search_method)

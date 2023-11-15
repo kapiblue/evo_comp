@@ -61,6 +61,7 @@ void LMLocalSearchSolver::run()
             // cout << "Applicable move:" << endl;
             // print_vector(move);
             add_temp_moves();
+            cout << this->temp_stored_moves.size() << endl;
             this->temp_stored_moves.clear();
             this->apply_app_move(&move, edge1_idx, edge2_idx);
         }
@@ -94,6 +95,8 @@ bool LMLocalSearchSolver::is_applicable(vector<int> *move,
     }
     else
     {
+        bool reversed = false;
+
         // Check if the edge between node1 and node2 exists in the solution
         int node1_idx = this->best_solution.find_node_idx(node1);
         int node2_idx = this->best_solution.get_next_node_idx(node1_idx);
@@ -105,6 +108,12 @@ bool LMLocalSearchSolver::is_applicable(vector<int> *move,
         {
             *keep = false;
             return false;
+        }
+        if (this->best_solution.get_node_at_idx(
+                this->best_solution.get_prev_node_idx(node1_idx)) == node2)
+        {
+            *keep = true;
+            reversed = true;
         }
 
         *arg1 = node1_idx;
@@ -124,6 +133,20 @@ bool LMLocalSearchSolver::is_applicable(vector<int> *move,
                     this->best_solution.get_next_node_idx(node3_idx)) != node4)
             {
                 *keep = false;
+                return false;
+            }
+            if (this->best_solution.get_node_at_idx(
+                    this->best_solution.get_prev_node_idx(node3_idx)) == node4 &&
+                reversed)
+            {
+                *arg1 = this->best_solution.get_prev_node_idx(node1_idx);
+                *arg2 = this->best_solution.get_prev_node_idx(node3_idx);
+                return true;
+            }
+            else if (this->best_solution.get_node_at_idx(
+                         this->best_solution.get_prev_node_idx(node3_idx)) == node4)
+            {
+                *keep = true;
                 return false;
             }
             else
@@ -235,6 +258,7 @@ void LMLocalSearchSolver::add_improving_edge_exchanges(int edge_idx)
     {
         if (abs(edge_idx - edge2_idx) > 1)
         {
+
             int delta = this->best_solution.calculate_delta_intra_route_edges(
                 &this->dist_mat, edge_idx, edge2_idx);
 

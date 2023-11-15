@@ -24,7 +24,7 @@ namespace N
     public:
         LocalSearchSolver(std::string instance_filename, double fraction_nodes, Solution initial_solution);
 
-        void set_initial_solution(Solution new_initial_solution);
+        void set_initial_solution(Solution *new_initial_solution);
         void write_best_to_csv(std::string filename);
         int get_best_solution_eval();
 
