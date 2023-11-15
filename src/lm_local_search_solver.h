@@ -13,6 +13,7 @@ namespace N
     {
     private:
         std::priority_queue<std::vector<int>, std::vector<std::vector<int>>, std::greater<>> LM;
+        std::vector<std::vector<int>> temp_stored_moves;
 
     public:
         LMLocalSearchSolver(std::string instance_filename,
@@ -30,7 +31,7 @@ namespace N
         void init_LM_inter_nodes();
         void add_improving_node_exchanges(int node_idx);
 
-        void add_moves(std::vector<std::vector<int>> *moves);
+        void add_temp_moves();
 
         void reset();
         void print_LM();
