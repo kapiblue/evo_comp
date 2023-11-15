@@ -31,11 +31,9 @@ void run_experiment()
 
         vector<int> best_evaluations;
         vector<double> generation_times;
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 200; i++)
         {
-            RandomSolution new_initial_solution = RandomSolution();
-            new_initial_solution.generate(200, 100);
-            lss.set_initial_solution(&new_initial_solution);
+            lss.reset();
             int generation_time = measure_generation_time(
                 &lss, &LMLocalSearchSolver::run);
             generation_times.push_back(generation_time);

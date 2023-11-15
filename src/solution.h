@@ -11,13 +11,12 @@ namespace N
     class Solution
     {
 
-    private:
+    protected:
         std::vector<int> nodes;
         // Count how many nodes are in the solution
         int n_nodes;
         // Sets for faster tracking
         std::set<int> selected;
-        int evaluation;
 
     public:
         void add_node(int node);
@@ -27,7 +26,10 @@ namespace N
         void set_nodes(std::vector<int> nodes);
 
         int get_number_of_nodes();
+        
         std::set<int> get_selected();
+        void set_selected(std::set<int> new_selected);
+
         int get_node_at_idx(int node_idx);
         int get_next_node_idx(int node_idx);
         int get_prev_node_idx(int node_idx);
@@ -39,7 +41,6 @@ namespace N
 
         int evaluate(std::vector<std::vector<int>> *dist_mat,
                      std::vector<int> *costs);
-        void set_evaluation(int evaluation_value);
 
         int most_beneficial_node(std::vector<int> all_distances,
                                  std::vector<int> all_costs, std::vector<int> excluded_distances);

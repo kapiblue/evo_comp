@@ -19,6 +19,25 @@ LMLocalSearchSolver::LMLocalSearchSolver(string instance_filename,
                                          Solution initial_solution)
     : LocalSearchSolver(instance_filename, fraction_nodes, initial_solution)
 {
+    this->reset();
+}
+
+void LMLocalSearchSolver::reset()
+{
+    // Clear LM
+    while (!this->LM.empty())
+    {
+        this->LM.pop();
+    }
+
+    // Set new random solution
+    RandomSolution new_initial_solution = RandomSolution();
+    new_initial_solution.generate(200, 100);
+    this->best_solution = new_initial_solution;
+    this->best_solution.set_nodes(new_initial_solution.get_nodes());
+    this->best_solution.set_selected(new_initial_solution.get_selected());
+    this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
+
     this->init_LM_intra_edges();
     this->init_LM_inter_nodes();
 }
@@ -26,9 +45,9 @@ LMLocalSearchSolver::LMLocalSearchSolver(string instance_filename,
 void LMLocalSearchSolver::run()
 {
     vector<vector<int>> kept_moves;
+    // cout << "LM SIZE: " << this->LM.size() << endl;
     while (!this->LM.empty())
     {
-        // cout << "LM SIZE: " << this->LM.size() << endl;
         vector<int> move = this->LM.top();
         this->LM.pop();
 
@@ -37,19 +56,17 @@ void LMLocalSearchSolver::run()
         int edge1_idx, edge2_idx;
         if (is_applicable(&move, &keep, &edge1_idx, &edge2_idx))
         {
+            // cout << "Applicable move:" << endl;
+            // print_vector(move);
             add_moves(&kept_moves);
             kept_moves.clear();
             this->apply_app_move(&move, edge1_idx, edge2_idx);
-            cout << this->best_sol_evaluation << endl;
         }
         if (keep)
         {
             kept_moves.push_back(move);
         }
     }
-    cout << this->best_sol_evaluation << endl;
-    int eval = best_solution.evaluate(&this->dist_mat, &this->costs);
-    cout << "Actual evaluation: " << eval << endl;
 }
 /*
 Searches all edges which could replace given edge
@@ -58,6 +75,7 @@ and adds improving moves to LM
 bool LMLocalSearchSolver::is_applicable(vector<int> *move,
                                         bool *keep, int *arg1, int *arg2)
 {
+
     int node1 = (*move)[1];
     int node2 = (*move)[2];
     int node3 = (*move)[3];
@@ -78,16 +96,19 @@ bool LMLocalSearchSolver::is_applicable(vector<int> *move,
         int node1_idx = this->best_solution.find_node_idx(node1);
         int node2_idx = this->best_solution.get_next_node_idx(node1_idx);
 
+        // cout << "Node indices: " << node1_idx << " " << node2_idx << endl;
+
         if (this->best_solution.get_node_at_idx(
                 node2_idx) != node2)
         {
+            // cout << "No first edge" << endl;
             return false;
         }
 
         *arg1 = node1_idx;
 
         // Additionally check move type
-        if ((*move)[5] == 0)
+        if (move_type == 0)
         {
             // intra edges
             if (!this->best_solution.contains(node4))
@@ -100,6 +121,7 @@ bool LMLocalSearchSolver::is_applicable(vector<int> *move,
             if (this->best_solution.get_node_at_idx(
                     this->best_solution.get_next_node_idx(node3_idx)) != node4)
             {
+                *keep = false;
                 return false;
             }
             else
@@ -113,6 +135,11 @@ bool LMLocalSearchSolver::is_applicable(vector<int> *move,
             // Check if there is an edge between node2 and node3
             if (this->best_solution.get_node_at_idx(
                     this->best_solution.get_next_node_idx(node2_idx)) != node3)
+            {
+                *keep = false;
+                return false;
+            }
+            else if (this->best_solution.contains(node4))
             {
                 return false;
             }
@@ -147,7 +174,6 @@ Applies move type, which is specified by the last element of the move vector
 void LMLocalSearchSolver::apply_app_move(vector<int> *move,
                                          int arg1, int arg2)
 {
-    print_vector(*move);
 
     int delta = (*move)[0];
     this->best_sol_evaluation += delta;
@@ -161,7 +187,7 @@ void LMLocalSearchSolver::apply_app_move(vector<int> *move,
     else
     {
         int new_node = (*move)[4];
-        apply_move("inter_nodes", &arg2, &new_node);
+        apply_move("inter", &arg2, &new_node);
     }
 
     add_improving_edge_exchanges(arg1);
@@ -193,13 +219,12 @@ void LMLocalSearchSolver::init_LM_intra_edges()
 }
 void LMLocalSearchSolver::add_improving_edge_exchanges(int edge_idx)
 {
-    for (int edge2_idx = edge_idx + 2; edge2_idx < this->best_solution.get_number_of_nodes(); ++edge2_idx)
+    for (int edge2_idx = edge_idx + 3; edge2_idx < this->best_solution.get_number_of_nodes(); ++edge2_idx)
     {
         int edge_idx_copy = edge_idx;
-        int temp_edge2_idx = edge2_idx;
 
         int delta = this->best_solution.calculate_delta_intra_route_edges(
-            &this->dist_mat, edge_idx_copy, temp_edge2_idx);
+            &this->dist_mat, edge_idx_copy, edge2_idx);
 
         if (delta < 0)
         {
@@ -207,12 +232,11 @@ void LMLocalSearchSolver::add_improving_edge_exchanges(int edge_idx)
             move.push_back(delta);
             move.push_back(this->best_solution.get_node_at_idx(edge_idx_copy));
             move.push_back(this->best_solution.get_node_at_idx(this->best_solution.get_next_node_idx(edge_idx_copy)));
-            move.push_back(this->best_solution.get_node_at_idx(temp_edge2_idx));
-            move.push_back(this->best_solution.get_node_at_idx(this->best_solution.get_next_node_idx(temp_edge2_idx)));
+            move.push_back(this->best_solution.get_node_at_idx(edge2_idx));
+            move.push_back(this->best_solution.get_node_at_idx(this->best_solution.get_next_node_idx(edge2_idx)));
             // Move type of intra edges is 0
             move.push_back(0);
             // cout << edge_idx_copy << " " << temp_edge2_idx << endl;
-            // cout << "MOVE: " << endl;
             // print_vector(move);
             this->LM.push(move);
         }

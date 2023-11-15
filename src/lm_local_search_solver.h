@@ -22,7 +22,7 @@ namespace N
         bool is_applicable(std::vector<int> *move,
                            bool *keep, int *edge1_idx, int *edge2_idx);
         void apply_app_move(std::vector<int> *move,
-                        int arg1, int arg2);
+                            int arg1, int arg2);
 
         void init_LM_intra_edges();
         void add_improving_edge_exchanges(int edge_idx);
@@ -32,6 +32,7 @@ namespace N
 
         void add_moves(std::vector<std::vector<int>> *moves);
 
+        void reset();
         void print_LM();
     };
 

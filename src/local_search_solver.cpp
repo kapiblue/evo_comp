@@ -17,15 +17,9 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
     : ProblemSolver(instance_filename, fraction_nodes)
 {
     this->best_solution = initial_solution;
+    this->best_solution.set_nodes(initial_solution.get_nodes());
+    this->best_solution.set_selected(initial_solution.get_selected());
     this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
-
-    cout << "Init eval " << this->best_sol_evaluation << endl;
-
-    // Initialize set of all node indexes
-    for (int i = 0; i < this->total_nodes; i++)
-    {
-        this->all_nodes.insert(i);
-    }
 
     vector<int> iterator1(this->best_solution.get_number_of_nodes());
     iota(iterator1.begin(), iterator1.end(), 0);
@@ -40,12 +34,15 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
     this->iterator_long = iterator_long;
 }
 
-
-void LocalSearchSolver::set_initial_solution(Solution *new_initial_solution)
+void LocalSearchSolver::set_initial_solution(Solution new_initial_solution2)
 {
-    this->best_solution = *new_initial_solution;
-    this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat,
-                                                             &this->costs);
+    RandomSolution new_initial_solution = RandomSolution();
+    new_initial_solution.generate(200, 100);
+    this->best_solution = new_initial_solution;
+    this->best_solution.set_nodes(new_initial_solution.get_nodes());
+    this->best_solution.set_selected(new_initial_solution.get_selected());
+    this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
+    cout << "Init eval " << this->best_sol_evaluation << endl;
 }
 
 void LocalSearchSolver::run_basic(string neigh_method, string search_method)
@@ -131,7 +128,7 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
     int min_node2_idx = -1;
     int delta;
 
-    if(search_method == "GREEDY")
+    if (search_method == "GREEDY")
     {
         shuffle(this->iterator1.begin(), this->iterator1.end(), this->rd);
         shuffle(this->iterator2.begin(), this->iterator2.end(), this->rd);
@@ -144,7 +141,7 @@ void LocalSearchSolver::find_best_intra_neighbor_nodes(int *out_delta, int *firs
             if (node1_idx < node2_idx)
             {
                 delta = this->best_solution.calculate_delta_intra_route_nodes(&this->dist_mat,
-                                                                            node1_idx, node2_idx);
+                                                                              node1_idx, node2_idx);
                 if (delta < min_delta)
                 {
                     min_delta = delta;
@@ -176,12 +173,12 @@ void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *firs
     int min_edge2_idx = -1;
     int delta;
 
-    if(search_method == "GREEDY")
+    if (search_method == "GREEDY")
     {
         shuffle(this->iterator1.begin(), this->iterator1.end(), this->rd);
         shuffle(this->iterator2.begin(), this->iterator2.end(), this->rd);
     }
-    
+
     for (auto &edge1_idx : this->iterator1)
     {
         for (auto &edge2_idx : this->iterator2)
@@ -212,7 +209,6 @@ void LocalSearchSolver::find_best_intra_neighbor_edges(int *out_delta, int *firs
     *second_edge_idx = min_edge2_idx;
 }
 
-
 void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_node, int *new_node, string search_method)
 {
     // Finds best neighbor by exchanging some selected node
@@ -222,12 +218,8 @@ void LocalSearchSolver::find_best_inter_neighbor(int *out_delta, int *exchanged_
     int min_exchanged_idx = -1;
     int min_new_node = -1;
 
-    // Doesn't work for now
-    // set<int> not_selected;
-    // this->best_solution.find_not_selected(not_selected, &this->all_nodes);
-
     // random order on indexes for greedy?
-    if(search_method == "GREEDY")
+    if (search_method == "GREEDY")
     {
         shuffle(this->iterator1.begin(), this->iterator1.end(), this->rd);
         shuffle(this->iterator_long.begin(), this->iterator_long.end(), this->rd);

@@ -31,11 +31,6 @@ void Solution::set_nodes(vector<int> nodes)
     this->n_nodes = nodes.size();
 }
 
-void Solution::set_evaluation(int evaluation_value)
-{
-    this->evaluation = evaluation_value;
-}
-
 vector<int> Solution::get_nodes()
 {
     return this->nodes;
@@ -49,6 +44,11 @@ int Solution::get_number_of_nodes()
 set<int> Solution::get_selected()
 {
     return this->selected;
+}
+
+void Solution::set_selected(set<int> new_selected)
+{
+    this->selected = new_selected;
 }
 
 int Solution::get_node_at_idx(int node_idx)
@@ -117,12 +117,6 @@ void Solution::exchange_2_edges(int edge1_idx, int edge2_idx)
 
 int Solution::evaluate(vector<vector<int>> *dist_mat, vector<int> *costs)
 {
-    // If evaluation was already calculated
-    // return the stored value
-    // if (this->evaluation > 0)
-    // {
-    //     return this->evaluation;
-    // }
 
     int temp_node_cost, temp_dist;
 
@@ -150,8 +144,6 @@ int Solution::evaluate(vector<vector<int>> *dist_mat, vector<int> *costs)
     }
 
     total_cost += (*dist_mat)[current][this->nodes[0]];
-
-    this->evaluation = total_cost;
 
     return total_cost;
 }
