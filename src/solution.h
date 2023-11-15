@@ -31,7 +31,7 @@ namespace N
         int get_node_at_idx(int node_idx);
         int get_next_node_idx(int node_idx);
         int get_prev_node_idx(int node_idx);
-        void find_not_selected(std::set<int> not_selected, std::set<int> *all_nodes);
+        int find_node_idx(int node);
         void exchange_node_at_idx(int node_idx, int new_node);
         void exchange_2_nodes(int node1_idx, int node2_idx);
         bool are_consecutive(int node1_idx, int node2_idx);

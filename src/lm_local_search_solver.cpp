@@ -21,57 +21,169 @@ LMLocalSearchSolver::LMLocalSearchSolver(string instance_filename,
 {
     this->init_LM_intra_edges();
     this->init_LM_inter_nodes();
-
-    this->print_LM();
 }
 
 void LMLocalSearchSolver::run()
 {
-    int current_best_delta = -1;
-    int best_inter_delta, best_intra_edges_delta;
+    vector<vector<int>> kept_moves;
+    while (!this->LM.empty())
+    {
+        // cout << "LM SIZE: " << this->LM.size() << endl;
+        vector<int> move = this->LM.top();
+        this->LM.pop();
 
-    int arg1, arg2, temp_arg1, temp_arg2;
-    string move_type;
-
-    // while (current_best_delta < 0)
-    // {
-    //     current_best_delta = 0;
-    //     this->find_best_intra_neighbor_edges(&best_intra_edges_delta, &temp_arg1, &temp_arg2, "STEEPEST");
-    //     if (best_intra_edges_delta < current_best_delta)
-    //     {
-    //         arg1 = temp_arg1;
-    //         arg2 = temp_arg2;
-    //         move_type = "intra_edges";
-    //         current_best_delta = best_intra_edges_delta;
-    //     }
-    //     // this->find_best_inter_neighbor(&best_inter_delta, &temp_arg1, &temp_arg2, "STEEPEST");
-    //     // if (best_inter_delta < current_best_delta)
-    //     // {
-    //     //     arg1 = temp_arg1;
-    //     //     arg2 = temp_arg2;
-    //     //     move_type = "inter";
-    //     //     current_best_delta = best_inter_delta;
-    //     // }
-    //     if (current_best_delta >= 0)
-    //     {
-    //         // We don't want to alter the solution
-    //         // if the new current delta is not less than 0
-    //         break;
-    //     }
-    //     // this->LM.push(current_best_delta);
-    //     // cout << "Move type " << move_type << " Delta " << current_best_delta << endl;
-    //     cout << arg1 << " " << arg2 << endl;
-    //     this->apply_move(move_type, &arg1, &arg2);
-    //     this->best_sol_evaluation += current_best_delta;
-    //     // cout << this->best_sol_evaluation << endl;
-    //     this->best_solution.print();
-    // }
-    // cout << this->best_sol_evaluation << endl;
+        // whether to keep the move
+        bool keep = true;
+        int edge1_idx, edge2_idx;
+        if (is_applicable(&move, &keep, &edge1_idx, &edge2_idx))
+        {
+            add_moves(&kept_moves);
+            kept_moves.clear();
+            this->apply_app_move(&move, edge1_idx, edge2_idx);
+            cout << this->best_sol_evaluation << endl;
+        }
+        if (keep)
+        {
+            kept_moves.push_back(move);
+        }
+    }
+    cout << this->best_sol_evaluation << endl;
+    int eval = best_solution.evaluate(&this->dist_mat, &this->costs);
+    cout << "Actual evaluation: " << eval << endl;
 }
 /*
 Searches all edges which could replace given edge
 and adds improving moves to LM
 */
+bool LMLocalSearchSolver::is_applicable(vector<int> *move,
+                                        bool *keep, int *arg1, int *arg2)
+{
+    int node1 = (*move)[1];
+    int node2 = (*move)[2];
+    int node3 = (*move)[3];
+    int node4 = (*move)[4];
+    int move_type = (*move)[5];
+
+    // Check if nodes are in the solution
+    if (!this->best_solution.contains(node1) ||
+        !this->best_solution.contains(node2) ||
+        !this->best_solution.contains(node3))
+    {
+        *keep = false;
+        return false;
+    }
+    else
+    {
+        // Check if the edge between node1 and node2 exists in the solution
+        int node1_idx = this->best_solution.find_node_idx(node1);
+        int node2_idx = this->best_solution.get_next_node_idx(node1_idx);
+
+        if (this->best_solution.get_node_at_idx(
+                node2_idx) != node2)
+        {
+            return false;
+        }
+
+        *arg1 = node1_idx;
+
+        // Additionally check move type
+        if ((*move)[5] == 0)
+        {
+            // intra edges
+            if (!this->best_solution.contains(node4))
+            {
+                *keep = false;
+                return false;
+            }
+            // Check if there is an edge between node3 and node4
+            int node3_idx = this->best_solution.find_node_idx(node3);
+            if (this->best_solution.get_node_at_idx(
+                    this->best_solution.get_next_node_idx(node3_idx)) != node4)
+            {
+                return false;
+            }
+            else
+            {
+                *arg2 = node3_idx;
+            }
+        }
+        else
+        {
+            // inter nodes
+            // Check if there is an edge between node2 and node3
+            if (this->best_solution.get_node_at_idx(
+                    this->best_solution.get_next_node_idx(node2_idx)) != node3)
+            {
+                return false;
+            }
+            else
+            {
+                *arg2 = node2_idx;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+/*
+Applies move type, which is specified by the last element of the move vector
+    move[0] - delta
+    move[5] - move type:
+    0 - intra edges:
+            move[1] - first node of the first edge
+            move[2] - second node of the first edge
+            move[3] - first node of the second edge
+            move[4] - second node of the second edge
+        arg1 - index of the first edge in the solution
+        arg2 - index of the second edge in the solution
+    1 - inter nodes:
+            move[1] - prevoius node of the exchanged node
+            move[2] - exchanged node
+            move[3] - next node of the exchanged node
+            move[4] - new node
+        arg1 - index of the prevoius node of the exchanged node
+        arg2 - index of the exchanged node
+*/
+void LMLocalSearchSolver::apply_app_move(vector<int> *move,
+                                         int arg1, int arg2)
+{
+    print_vector(*move);
+
+    int delta = (*move)[0];
+    this->best_sol_evaluation += delta;
+    // Check move type
+    if ((*move)[5] == 0)
+    {
+        // intra edges
+        apply_move("intra_edges", &arg1, &arg2);
+    }
+
+    else
+    {
+        int new_node = (*move)[4];
+        apply_move("inter_nodes", &arg2, &new_node);
+    }
+
+    add_improving_edge_exchanges(arg1);
+    add_improving_edge_exchanges(arg2);
+
+    add_improving_node_exchanges(arg1);
+    add_improving_node_exchanges(this->best_solution.get_next_node_idx(arg2));
+}
+
+/*
+Pushes to LM moves from a vector.
+This is mainly intended for pushing again the currently
+non applicable moves
+*/
+void LMLocalSearchSolver::add_moves(std::vector<std::vector<int>> *moves)
+{
+    for (auto move : *moves)
+    {
+        this->LM.push(move);
+    }
+}
+
 void LMLocalSearchSolver::init_LM_intra_edges()
 {
     for (auto edge_idx : this->iterator1)
@@ -81,7 +193,6 @@ void LMLocalSearchSolver::init_LM_intra_edges()
 }
 void LMLocalSearchSolver::add_improving_edge_exchanges(int edge_idx)
 {
-    cout << edge_idx << endl;
     for (int edge2_idx = edge_idx + 2; edge2_idx < this->best_solution.get_number_of_nodes(); ++edge2_idx)
     {
         int edge_idx_copy = edge_idx;
@@ -100,9 +211,9 @@ void LMLocalSearchSolver::add_improving_edge_exchanges(int edge_idx)
             move.push_back(this->best_solution.get_node_at_idx(this->best_solution.get_next_node_idx(temp_edge2_idx)));
             // Move type of intra edges is 0
             move.push_back(0);
-            cout << edge_idx_copy << " " << temp_edge2_idx << endl;
-            cout << "MOVE: " << endl;
-            print_vector(move);
+            // cout << edge_idx_copy << " " << temp_edge2_idx << endl;
+            // cout << "MOVE: " << endl;
+            // print_vector(move);
             this->LM.push(move);
         }
     }
@@ -137,9 +248,9 @@ void LMLocalSearchSolver::add_improving_node_exchanges(int node_idx)
                 move.push_back(node);
                 // Move type of intra edges is 0
                 move.push_back(1);
-                cout << node_idx << " " << node << endl;
-                cout << "MOVE: " << endl;
-                print_vector(move);
+                // cout << node_idx << " " << node << endl;
+                // cout << "MOVE: " << endl;
+                // print_vector(move);
                 this->LM.push(move);
             }
         }

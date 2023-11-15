@@ -66,12 +66,14 @@ int Solution::get_prev_node_idx(int node_idx)
     return (node_idx + this->n_nodes - 1) % this->n_nodes;
 }
 
-void Solution::find_not_selected(std::set<int> not_selected, std::set<int> *all_nodes)
+int Solution::find_node_idx(int node)
 {
-    // insert_iterator<set<int>> intersect_iterate(not_selected, (not_selected).begin());
-    // set_intersection(this->selected.begin(), this->selected.end(),
-    //                  *all_nodes->begin(), *all_nodes->end(),
-    //                  intersect_iterate);
+    auto it = find(this->nodes.begin(), this->nodes.end(), node);
+    if (it != this->nodes.end())
+    {
+        return it - this->nodes.begin();
+    }
+    return -1;
 }
 
 void Solution::exchange_node_at_idx(int node_idx, int new_node)
