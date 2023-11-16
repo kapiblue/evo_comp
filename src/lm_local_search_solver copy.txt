@@ -85,107 +85,98 @@ bool LMLocalSearchSolver::is_applicable(vector<int> *move,
     int node4 = (*move)[4];
     int move_type = (*move)[5];
 
-    int node1_idx = this->best_solution.find_node_idx(node1);
-    int node2_idx, node3_idx, node4_idx;
-    int node1_idx_n, node1_idx_n_n , node1_idx_p, node1_idx_p_p ;
-    int node3_idx_n, node3_idx_p;
+    // Check if nodes are in the solution
+    if (!this->best_solution.contains(node1) ||
+        !this->best_solution.contains(node2) ||
+        !this->best_solution.contains(node3))
+    {
+        *keep = false;
+        return false;
+    }
 
-    // Check move type
+    bool reversed = false;
+
+    // Check if the edge between node1 and node2 exists in the solution
+    int node1_idx = this->best_solution.find_node_idx(node1);
+    int node2_idx = this->best_solution.get_next_node_idx(node1_idx);
+
+    // cout << "Node indices: " << node1_idx << " " << node2_idx << endl;
+
+    if (this->best_solution.get_node_at_idx(
+            node2_idx) != node2)
+    {
+        *keep = false;
+        return false;
+    }
+    if (this->best_solution.get_node_at_idx(
+            this->best_solution.get_prev_node_idx(node1_idx)) == node2)
+    {
+        *keep = true;
+        reversed = true;
+    }
+
+    *arg1 = node1_idx;
+
+    // Additionally check move type
     if (move_type == 0)
     {
-        // check node appearence
-        if (!this->best_solution.contains(node1) || !this->best_solution.contains(node2) || !this->best_solution.contains(node3) || !this->best_solution.contains(node4))
+        // intra edges
+        if (!this->best_solution.contains(node4))
         {
             *keep = false;
             return false;
         }
-
-        // Check if there is an edge between node1 and node2
-        node1_idx_n = this->best_solution.get_next_node_idx(node1_idx);
-        node1_idx_p = this->best_solution.get_prev_node_idx(node1_idx);
-        if (this->best_solution.get_node_at_idx(node1_idx_n) != node2 &&
-            this->best_solution.get_node_at_idx(node1_idx_p) != node2)
-        {
-            *keep = false;
-            return false;
-        }
-        
         // Check if there is an edge between node3 and node4
-        node3_idx = this->best_solution.find_node_idx(node3);
-        node3_idx_n = this->best_solution.get_next_node_idx(node3_idx);
-        node3_idx_p = this->best_solution.get_prev_node_idx(node3_idx);
-        if (this->best_solution.get_node_at_idx(node3_idx_n) != node4 &&
-            this->best_solution.get_node_at_idx(node3_idx_p) != node4)
+        int node3_idx = this->best_solution.find_node_idx(node3);
+        if (this->best_solution.get_node_at_idx(
+                this->best_solution.get_next_node_idx(node3_idx)) != node4)
         {
             *keep = false;
             return false;
         }
-
-        // Check if (node1 before node2) and (node3 before node4)
-        if (this->best_solution.get_node_at_idx(node3_idx_n) == node4 && 
-            this->best_solution.get_node_at_idx(node1_idx_n) == node2)
+        if (this->best_solution.get_node_at_idx(
+                this->best_solution.get_prev_node_idx(node3_idx)) == node4 &&
+            reversed)
         {
-            *arg1 = node1_idx;
+            *arg1 = this->best_solution.get_prev_node_idx(node1_idx);
+            *arg2 = this->best_solution.get_prev_node_idx(node3_idx);
+            return true;
+        }
+        else if (this->best_solution.get_node_at_idx(
+                        this->best_solution.get_prev_node_idx(node3_idx)) == node4)
+        {
+            *keep = true;
+            return false;
+        }
+        else
+        {
             *arg2 = node3_idx;
-            *keep = false;
             return true;
         }
-
-        // Check if (node1 after node2) and (node3 after node4)
-        if (this->best_solution.get_node_at_idx(node3_idx_p) == node4 && 
-            this->best_solution.get_node_at_idx(node1_idx_p) == node2)
-        {
-            *arg1 = node1_idx_p;
-            *arg2 = node3_idx_p;
-            *keep = false;
-            return true;
-        }
-
-        // //Check if there are edges in reverse order
-        // if ((this->best_solution.get_node_at_idx(node3_idx_n) == node4 && this->best_solution.get_node_at_idx(node1_idx_p) == node2) ||
-        //     ((this->best_solution.get_node_at_idx(node3_idx_p) == node4 && this->best_solution.get_node_at_idx(node1_idx_n) == node2)))
-     
-        *keep = true;
-        return false;
-        
     }
     else
     {
-
-        *keep = false;
-
-        // check node appearence
-        if (!this->best_solution.contains(node1) || !this->best_solution.contains(node2) || !this->best_solution.contains(node3) || this->best_solution.contains(node4))
+        // inter nodes
+        // Check if there is an edge between node2 and node3
+        if (this->best_solution.get_node_at_idx(
+                this->best_solution.get_next_node_idx(node2_idx)) != node3)
         {
+            *keep = false;
             return false;
         }
-
-        node1_idx_n = this->best_solution.get_next_node_idx(node1_idx);
-        node1_idx_n_n = this->best_solution.get_next_node_idx(node1_idx_n);
-
-        // Check if there is an edge between (node1 before node2) and (node2 before node3)
-        if (this->best_solution.get_node_at_idx(node1_idx_n) == node2 &&
-            this->best_solution.get_node_at_idx(node1_idx_n_n) == node3)
+        else if (this->best_solution.contains(node4))
         {
-            *arg1 = node1_idx;
-            *arg2 = node1_idx_n;
+            *keep = false;
+            return false;
+        }
+        else
+        {
+            // index of the node to be exchanged
+            *arg2 = node2_idx;
             return true;
         }
-
-        node1_idx_p = this->best_solution.get_prev_node_idx(node1_idx); 
-        node1_idx_p_p = this->best_solution.get_prev_node_idx(node1_idx_p);
-
-        // Check if there is an edge between (node1 after node2) and (node2 after node3)
-        if (this->best_solution.get_node_at_idx(node1_idx_p) == node2 &&
-            this->best_solution.get_node_at_idx(node1_idx_p_p) == node3)
-        {
-            *arg1 = node1_idx_p_p;
-            *arg2 = node1_idx_p;
-            return true;
-        }
-            
-        return false;
     }
+    return true;
 }
 /*
 Applies move type, which is specified by the last element of the move vector

@@ -19,7 +19,7 @@ vector<string> instances = {"instance_data/TSPA.csv",
                             "instance_data/TSPC.csv",
                             "instance_data/TSPD.csv"};
 
-void run_experiment()
+void run_experiment() 
 {
     srand(time(NULL));
 
@@ -40,9 +40,9 @@ void run_experiment()
             int eval = lss.get_best_solution_eval();
             best_evaluations.push_back(eval);
         }
-        // string dir = "lab4/solutions/" + instance.substr(14, 4) + "/";
-        // string filename = "plot.csv";
-        // lss.write_best_to_csv(dir + filename);
+        string dir = "lab5/solutions/" + instance.substr(14, 4) + "/";
+        string filename = "plot.csv";
+        lss.write_best_to_csv(dir + filename);
         int min_e, max_e;
         double min_t, avg_t, max_t, avg_e;
         calculate_stats(&best_evaluations, &min_e, &avg_e, &max_e);
