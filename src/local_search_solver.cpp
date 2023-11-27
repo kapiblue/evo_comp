@@ -36,8 +36,16 @@ LocalSearchSolver::LocalSearchSolver(string instance_filename, double fraction_n
 
 void LocalSearchSolver::set_initial_solution(Solution *new_initial_solution)
 {
-    
+
     this->best_solution = *new_initial_solution;
+    this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
+}
+
+void LocalSearchSolver::set_initial_solution_copy(Solution new_initial_solution)
+{
+    this->best_solution = new_initial_solution;
+    this->best_solution.set_nodes(new_initial_solution.get_nodes());
+    this->best_solution.set_selected(new_initial_solution.get_selected());
     this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
 }
 
@@ -281,4 +289,8 @@ int LocalSearchSolver::get_best_solution_eval()
 vector<int> LocalSearchSolver::get_best_solution()
 {
     return this->best_solution.get_nodes();
+}
+Solution LocalSearchSolver::get_best_full_solution()
+{
+    return this->best_solution;
 }

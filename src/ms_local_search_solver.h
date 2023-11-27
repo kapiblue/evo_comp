@@ -12,13 +12,15 @@ namespace N
     class MSLocalSearchSolver : public LocalSearchSolver
     {
     private:
-        std::string i_filename;
         Solution i_solution;
         double f_nodes;
+        std::string i_filename;
+
     public:
         MSLocalSearchSolver(std::string instance_filename,
                             double fraction_nodes,
                             Solution initial_solution);
+        void set_best_solution(Solution new_best);
         void reset();
         void run();
     };
