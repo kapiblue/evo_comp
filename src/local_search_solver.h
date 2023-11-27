@@ -27,6 +27,7 @@ namespace N
         void set_initial_solution(Solution *new_initial_solution);
         void write_best_to_csv(std::string filename);
         int get_best_solution_eval();
+        std::vector<int> get_best_solution();
 
         void run_basic(std::string neigh_method, std::string search_method);
 

@@ -278,3 +278,7 @@ int LocalSearchSolver::get_best_solution_eval()
 {
     return this->best_sol_evaluation;
 }
+vector<int> LocalSearchSolver::get_best_solution()
+{
+    return this->best_solution.get_nodes();
+}
