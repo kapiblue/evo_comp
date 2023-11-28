@@ -41,7 +41,7 @@ ProblemSolver::ProblemSolver(string instance_filename, double fraction_nodes)
     // should be covered in the solotion
     this->n_nodes = int(this->total_nodes * fraction_nodes);
 
-    cout << instance_name << endl;
+    // cout << instance_name << endl;
 }
 vector<vector<int>> ProblemSolver::get_distance_matrix() { return this->dist_mat; }
 std::vector<int> ProblemSolver::get_costs() {return this->costs; }

@@ -1,4 +1,5 @@
 #include "ms_local_search_solver.h"
+#include "i_local_search_solver.h"
 
 #include "random_solution.h"
 #include "utils.h"
@@ -24,30 +25,52 @@ void run_experiment()
     srand(time(NULL));
     for (auto instance : instances)
     {
+        cout<<instance.substr(14, 4)<<endl;
+        int rep = 2;
         RandomSolution initial_solution = RandomSolution();
         initial_solution.generate(200, 100);
 
-        MSLocalSearchSolver lss = MSLocalSearchSolver(instance, 0.5, initial_solution);
-        vector<int> best_evaluations;
-        vector<double> generation_times;
-        for (int i = 0; i < 20; i++)
+        MSLocalSearchSolver mslss = MSLocalSearchSolver(instance, 0.5, initial_solution);
+        vector<int> best_evaluations_ms;
+        vector<double> generation_times_ms;
+        for (int i = 0; i < rep; i++)
         {
-            lss.reset();
+            mslss.reset();
             int generation_time = measure_generation_time(
-                &lss, &MSLocalSearchSolver::run);
-            generation_times.push_back(generation_time);
-            int eval = lss.get_best_solution_eval();
-            best_evaluations.push_back(eval);
+                &mslss, &MSLocalSearchSolver::run);
+            generation_times_ms.push_back(generation_time);
+            int eval = mslss.get_best_solution_eval();
+            best_evaluations_ms.push_back(eval);
         }
         // string dir = "lab6/solutions/" + instance.substr(14, 4) + "/";
         // string filename = "plot.csv";
         // lss.write_best_to_csv(dir + filename);
-        int min_e, max_e;
-        double min_t, avg_t, max_t, avg_e;
-        calculate_stats(&best_evaluations, &min_e, &avg_e, &max_e);
-        cout << "EVAL " << avg_e << " (" << min_e << "-" << max_e << ")" << endl;
-        calculate_stats(&generation_times, &min_t, &avg_t, &max_t);
-        cout << "TIME " << avg_t << " (" << min_t << "-" << max_t << ")" << endl;
+        int min_e_ms, max_e_ms;
+        double min_t_ms, avg_t_ms, max_t_ms, avg_e_ms;
+        calculate_stats(&best_evaluations_ms, &min_e_ms, &avg_e_ms, &max_e_ms);
+        cout << "EVAL MSLS " << avg_e_ms << " (" << min_e_ms << "-" << max_e_ms << ")" << endl;
+        calculate_stats(&generation_times_ms, &min_t_ms, &avg_t_ms, &max_t_ms);
+        cout << "TIME MSLS " << avg_t_ms/1000 << " (" << min_t_ms/1000 << "-" << max_t_ms/1000 << ")" << endl;
+        
+        ILocalSearchSolver ilss = ILocalSearchSolver(instance, 0.5, initial_solution);
+        vector<int> best_evaluations_i;
+        vector<double> generation_times_i;
+        for (int i = 0; i < rep; i++)
+        {
+            ilss.reset();
+            int generation_time = measure_generation_time( avg_t_ms,
+                &ilss, &ILocalSearchSolver::run);
+            generation_times_i.push_back(generation_time);
+            int eval = ilss.get_best_solution_eval();
+            best_evaluations_i.push_back(eval);
+        }
+        int min_e_i, max_e_i;
+        double min_t_i, avg_t_i, max_t_i, avg_e_i;
+        calculate_stats(&best_evaluations_i, &min_e_i, &avg_e_i, &max_e_i);
+        cout << "EVAL ILS " << avg_e_i << " (" << min_e_i << "-" << max_e_i << ")" << endl;
+        calculate_stats(&generation_times_i, &min_t_i, &avg_t_i, &max_t_i);
+        cout << "TIME ILS " << avg_t_i/1000 << " (" << min_t_i/1000 << "-" << max_t_i/1000 << ")" << endl;
+
     }
 }
 
