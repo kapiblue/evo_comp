@@ -22,19 +22,7 @@ ILocalSearchSolver::ILocalSearchSolver(string instance_filename,
 {
     this->i_filename = instance_filename;
     this->f_nodes = fraction_nodes;
-}
-
-void ILocalSearchSolver::reset()
-{
-    // Set new random solution
-    RandomSolution new_initial_solution = RandomSolution();
-    new_initial_solution.generate(200, 100);
-    this->i_solution = new_initial_solution;
-    this->i_solution.set_nodes(new_initial_solution.get_nodes());
-    this->i_solution.set_selected(new_initial_solution.get_selected());
-
-    this->best_solution = new_initial_solution;
-    this->best_sol_evaluation = 1000000;
+    this->i_solution = initial_solution;
 }
 
 void ILocalSearchSolver::set_best_solution(Solution new_best)
@@ -42,27 +30,6 @@ void ILocalSearchSolver::set_best_solution(Solution new_best)
     this->best_solution = new_best;
     this->best_solution.set_nodes(new_best.get_nodes());
     this->best_solution.set_selected(new_best.get_selected());
-}
-
-void ILocalSearchSolver::perform_random_edge_exchanges(Solution *solution, int n)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        int edge1 = 0;
-        int edge2 = 0;
-        while (abs(edge1 - edge2) < 2)
-        {
-            edge1 = rand() % 100;
-            edge2 = rand() % 100;
-
-            if (edge1 > edge2)
-            {
-                swap(edge1, edge2);
-            }
-        }
-        solution->exchange_2_edges(edge1, edge2);
-    }
-    // cout << (*solution).evaluate(&this->dist_mat, &this->costs) << endl;
 }
 
 void ILocalSearchSolver::run(double time)
@@ -92,16 +59,6 @@ void ILocalSearchSolver::run(double time)
         {
             break;
         }
-
-        int node_to_add = 0;
-        int node_to_remove_idx = 0;
-
-        // while (((*solver.get_best_solution()).contains(node_to_add)))
-        // {
-        //     node_to_add = rand() % 200;
-        //     node_to_remove_idx = rand() % 100;
-        // }
-        // this->best_solution.exchange_node_at_idx(node_to_remove_idx, node_to_add);
 
         // Perturb current best solution
         solver.perturb_best_solution(3);

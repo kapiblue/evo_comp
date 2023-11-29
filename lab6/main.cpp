@@ -42,9 +42,9 @@ void run_experiment()
             int eval = mslss.get_best_solution_eval();
             best_evaluations_ms.push_back(eval);
         }
-        // string dir = "lab6/solutions/" + instance.substr(14, 4) + "/";
-        // string filename = "plot.csv";
-        // lss.write_best_to_csv(dir + filename);
+        string dir = "lab6/solutions/" + instance.substr(14, 4) + "/";
+        string filename = "MSLS.csv";
+        mslss.write_best_to_csv(dir + filename);
         int min_e_ms, max_e_ms;
         double min_t_ms, avg_t_ms, max_t_ms, avg_e_ms;
         calculate_stats(&best_evaluations_ms, &min_e_ms, &avg_e_ms, &max_e_ms);
@@ -57,13 +57,14 @@ void run_experiment()
         vector<double> generation_times_i;
         for (int i = 0; i < rep; i++)
         {
-            ilss.reset();
             int generation_time = measure_generation_time(avg_t_ms,
                 &ilss, &ILocalSearchSolver::run);
             generation_times_i.push_back(generation_time);
             int eval = ilss.get_best_solution_eval();
             best_evaluations_i.push_back(eval);
         }
+        filename = "ILS.csv";
+        ilss.write_best_to_csv(dir + filename);
         int min_e_i, max_e_i;
         double min_t_i, avg_t_i, max_t_i, avg_e_i;
         calculate_stats(&best_evaluations_i, &min_e_i, &avg_e_i, &max_e_i);
