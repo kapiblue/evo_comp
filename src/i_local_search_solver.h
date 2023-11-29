@@ -18,8 +18,9 @@ namespace N
 
     public:
         ILocalSearchSolver(std::string instance_filename,
-                            double fraction_nodes,
-                            Solution initial_solution);
+                           double fraction_nodes,
+                           Solution initial_solution);
+        void perform_random_edge_exchanges(Solution *solution, int n);
         void set_best_solution(Solution new_best);
         void reset();
         void run(double time);

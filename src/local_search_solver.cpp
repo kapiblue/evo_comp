@@ -276,6 +276,28 @@ void LocalSearchSolver::apply_move(string move_type, int *arg1, int *arg2)
         this->best_solution.exchange_2_edges(*arg1, *arg2);
     }
 }
+void LocalSearchSolver::perturb_best_solution(int n)
+{
+    for (int i = 0; i < n; ++i)
+    {
+        int edge1 = 0;
+        int edge2 = 0;
+        while (abs(edge1 - edge2) < 2)
+        {
+            edge1 = rand() % 100;
+            edge2 = rand() % 100;
+
+            if (edge1 > edge2)
+            {
+                swap(edge1, edge2);
+            }
+        }
+        int delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
+                                                                          edge1, edge2);
+        this->best_sol_evaluation += delta;
+        this->best_solution.exchange_2_edges(edge1, edge2);
+    }
+}
 
 void LocalSearchSolver::write_best_to_csv(string filename)
 {
@@ -293,4 +315,8 @@ vector<int> LocalSearchSolver::get_best_solution()
 Solution LocalSearchSolver::get_best_full_solution()
 {
     return this->best_solution;
+}
+Solution *LocalSearchSolver::get_best_solution_addr()
+{
+    return &this->best_solution;
 }

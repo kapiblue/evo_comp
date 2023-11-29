@@ -29,6 +29,8 @@ namespace N
         int get_best_solution_eval();
         std::vector<int> get_best_solution();
         Solution get_best_full_solution();
+        Solution *get_best_solution_addr();
+        void perturb_best_solution(int n);
 
         void run_basic(std::string neigh_method, std::string search_method);
 
