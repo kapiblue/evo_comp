@@ -12,13 +12,12 @@
 #include <utility>
 #include <random>
 
-
 using namespace std;
 using namespace N;
 
 ILocalSearchSolver::ILocalSearchSolver(string instance_filename,
-                                         double fraction_nodes,
-                                         Solution initial_solution)
+                                       double fraction_nodes,
+                                       Solution initial_solution)
     : LocalSearchSolver(instance_filename, fraction_nodes, initial_solution)
 {
     this->i_filename = instance_filename;
@@ -55,32 +54,40 @@ void ILocalSearchSolver::run(double time)
     new_initial_solution.generate(200, 100);
     solver.set_initial_solution_copy(new_initial_solution);
     auto start = std::chrono::steady_clock::now();
-    while(true)
+    solver.run_basic("TWO_EDGES", "STEEPEST");
+    while (true)
     {
         auto end = std::chrono::steady_clock::now();
         double so_far = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-        if( so_far > time ){
+        if (so_far > time)
+        {
             break;
         }
 
-        int node_to_add=0;
+        int node_to_add = 0;
         int node_to_remove_idx = 0;
         int edge1 = 0;
         int edge2 = 0;
-        while(this->best_solution.contains(node_to_add))
+
+        while (this->best_solution.contains(node_to_add))
         {
             node_to_add = rand() % 200;
             node_to_remove_idx = rand() % 100;
         }
         this->best_solution.exchange_node_at_idx(node_to_remove_idx, node_to_add);
-        
-        while(!(edge1 < edge2 - 1))
+        while (abs(edge1 - edge2) < 2)
         {
             edge1 = rand() % 100;
             edge2 = rand() % 100;
+
+            if (edge1 > edge2)
+            {
+                swap(edge1, edge2);
+            }
         }
         this->best_solution.exchange_2_edges(edge1, edge2);
-        
+
+
         solver.run_basic("TWO_EDGES", "STEEPEST");
         int solver_best_eval = solver.get_best_solution_eval();
         if (solver_best_eval < this->best_sol_evaluation)
@@ -89,8 +96,6 @@ void ILocalSearchSolver::run(double time)
             this->best_sol_evaluation = solver_best_eval;
             solver.set_initial_solution_copy(this->best_solution);
         }
-
     }
     cout << "Best found in run of ILS: " << this->best_sol_evaluation << endl;
-    
 }

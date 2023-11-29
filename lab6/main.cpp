@@ -58,7 +58,7 @@ void run_experiment()
         for (int i = 0; i < rep; i++)
         {
             ilss.reset();
-            int generation_time = measure_generation_time( avg_t_ms,
+            int generation_time = measure_generation_time(avg_t_ms,
                 &ilss, &ILocalSearchSolver::run);
             generation_times_i.push_back(generation_time);
             int eval = ilss.get_best_solution_eval();
