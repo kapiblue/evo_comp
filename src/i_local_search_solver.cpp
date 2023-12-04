@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <utility>
 #include <random>
+#include <vector>
 
 using namespace std;
 using namespace N;
@@ -32,6 +33,13 @@ void ILocalSearchSolver::set_best_solution(Solution new_best)
     this->best_solution.set_selected(new_best.get_selected());
 }
 
+double ILocalSearchSolver::get_avg_iter()
+{
+    double avg = mean(&this->iter_count);
+    this->iter_count.clear();
+    return avg;
+}
+
 void ILocalSearchSolver::run(double time)
 {
     LocalSearchSolver solver = LocalSearchSolver(this->i_filename,
@@ -51,6 +59,7 @@ void ILocalSearchSolver::run(double time)
     this->set_best_solution(solver.get_best_full_solution());
 
     cout << this->best_solution.evaluate(&this->dist_mat, &this->costs) << endl;
+    int counter;
     while (true)
     {
         auto end = std::chrono::steady_clock::now();
@@ -59,9 +68,9 @@ void ILocalSearchSolver::run(double time)
         {
             break;
         }
-
+        counter += 1;
         // Perturb current best solution
-        solver.perturb_best_solution(3);
+        solver.perturb_best_solution(4);
 
         solver.run_basic("TWO_EDGES", "STEEPEST");
         int solver_best_eval = solver.get_best_solution_eval();
@@ -71,5 +80,6 @@ void ILocalSearchSolver::run(double time)
             this->best_sol_evaluation = solver_best_eval;
         }
     }
-    cout << "Best found in run of ILS: " << this->best_sol_evaluation << endl;
+    this->iter_count.push_back(counter);
+    // cout << "Best found in run of ILS: " << this->best_sol_evaluation << endl;
 }
