@@ -278,18 +278,6 @@ void LocalSearchSolver::apply_move(string move_type, int *arg1, int *arg2)
 }
 void LocalSearchSolver::perturb_best_solution(int n)
 {
-    // int node_to_add = 0;
-    // int node_to_remove_idx = 0;
-    // while (this->best_solution.contains(node_to_add))
-    // {
-    //     node_to_add = rand() % 200;
-    //     node_to_remove_idx = rand() % 100;
-    // }
-    // int delta = this->best_solution.calculate_delta_inter_route(&this->dist_mat, &this->costs,
-    //                                                             node_to_remove_idx, node_to_add);
-    // this->best_sol_evaluation += delta;
-    // this->best_solution.exchange_node_at_idx(node_to_remove_idx, node_to_add);
-
     for (int i = 0; i < n; ++i)
     {
         int edge1 = 0;
@@ -309,6 +297,26 @@ void LocalSearchSolver::perturb_best_solution(int n)
         this->best_sol_evaluation += delta;
         this->best_solution.exchange_2_edges(edge1, edge2);
     }
+}
+
+void LocalSearchSolver::destroy_and_repair_best_solution()
+{
+    int edge1 = 0;
+    int edge2 = 0;
+    while (abs(edge1 - edge2) < 2)
+    {
+        edge1 = rand() % 100;
+        edge2 = rand() % 100;
+
+        if (edge1 > edge2)
+        {
+            swap(edge1, edge2);
+        }
+    }
+    int delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
+                                                                      edge1, edge2);
+    this->best_sol_evaluation += delta;
+    this->best_solution.exchange_2_edges(edge1, edge2);
 }
 
 void LocalSearchSolver::write_best_to_csv(string filename)

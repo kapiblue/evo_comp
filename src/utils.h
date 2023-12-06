@@ -108,6 +108,21 @@ double measure_generation_time(double time,
 }
 
 /**
+ * Measures execution time of a large-scale neighborhood local search run in microseconds.
+ */
+template <typename T>
+double measure_generation_time(double time,
+                               bool inner_local_search,
+                               T *obj,
+                               void (T::*func)(double, bool))
+{
+    auto begin = std::chrono::steady_clock::now();
+    (obj->*func)(time, inner_local_search);
+    auto end = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+}
+
+/**
  * Measures execution time of a local search run in microseconds.
  */
 template <typename T>
