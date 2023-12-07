@@ -59,7 +59,7 @@ void ILocalSearchSolver::run(double time)
     this->set_best_solution(solver.get_best_full_solution());
 
     cout << this->best_solution.evaluate(&this->dist_mat, &this->costs) << endl;
-    int counter;
+    int counter = 0;
     while (true)
     {
         auto end = std::chrono::steady_clock::now();
@@ -80,6 +80,7 @@ void ILocalSearchSolver::run(double time)
             this->best_sol_evaluation = solver_best_eval;
         }
     }
+    cout << counter << endl;
     this->iter_count.push_back(counter);
     // cout << "Best found in run of ILS: " << this->best_sol_evaluation << endl;
 }

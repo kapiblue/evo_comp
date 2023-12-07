@@ -18,6 +18,17 @@ void Solution::add_node(int node)
     this->selected.insert(node);
     this->n_nodes += 1;
 }
+void Solution::remove_node(int idx){
+    this->selected.erase(this->nodes[idx]);
+    this->nodes.erase(this->nodes.begin() + idx);
+    this->n_nodes -= 1;
+}
+
+void Solution::remove_nodes(int idx, int amount){
+    for(int i=0;i<amount;i++){
+        this->remove_node(idx);
+    }
+}
 
 bool Solution::contains(int node)
 {

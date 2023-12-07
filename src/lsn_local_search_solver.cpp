@@ -52,8 +52,8 @@ void LSNLocalSearchSolver::run(double time, bool inner_local_search)
     this->best_sol_evaluation = solver.get_best_solution_eval();
     this->set_best_solution(solver.get_best_full_solution());
 
-    cout << this->best_solution.evaluate(&this->dist_mat, &this->costs) << endl;
-    int counter;
+    // cout << this->best_solution.evaluate(&this->dist_mat, &this->costs) << endl;
+    int counter = 0;
     while (true)
     {
         auto end = std::chrono::steady_clock::now();
@@ -62,7 +62,7 @@ void LSNLocalSearchSolver::run(double time, bool inner_local_search)
         {
             break;
         }
-        ++counter;
+        counter++;
         // Destroy and repair current best solution
         solver.destroy_and_repair_best_solution();
 
@@ -79,5 +79,5 @@ void LSNLocalSearchSolver::run(double time, bool inner_local_search)
         }
     }
     this->iter_count.push_back(counter);
-    cout << "Best found in run of LSNLS: " << this->best_sol_evaluation << endl;
+    // cout << "Best found in run of LSNLS: " << this->best_sol_evaluation << endl;
 }

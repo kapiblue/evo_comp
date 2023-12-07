@@ -20,6 +20,8 @@ namespace N
 
     public:
         void add_node(int node);
+        void remove_node(int idx);
+        void remove_nodes(int idx, int amount);
         bool contains(int node);
 
         std::vector<int> get_nodes();

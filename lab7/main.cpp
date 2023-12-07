@@ -30,8 +30,8 @@ void run_experiment(bool inner_local_search)
     {
         cout << instance.substr(14, 4) << endl;
         // Convert to microseconds
-        int time_limit = int(time_limits[instance_idx]);
-        cout << time_limit << endl;
+        int time_limit = int(time_limits[instance_idx]) * 1000;
+        // cout << "time: "<< time_limit << endl;
         ++instance_idx;
 
         RandomSolution initial_solution = RandomSolution();
@@ -51,7 +51,10 @@ void run_experiment(bool inner_local_search)
             best_evaluations.push_back(eval);
         }
         string dir = "lab7/solutions/" + instance.substr(14, 4) + "/";
-        string filename = "LSNLS.csv";
+        string filename = "LSNLS_NO_INNER_LOCAL_SEARCH.csv";
+        if(inner_local_search){
+            filename = "LSNLS_INNER_LOCAL_SEARCH.csv";
+        }
         lsnlss.write_best_to_csv(dir + filename);
 
         int min_e_ms, max_e_ms;
@@ -69,7 +72,12 @@ void run_experiment(bool inner_local_search)
 
 int main()
 {
+    cout<<"NO INNER LOCAL SEARCH"<<endl;
     bool inner_local_search = false;
+    run_experiment(inner_local_search);
+
+    cout<<endl<<"INNER LOCAL SEARCH"<<endl;
+    inner_local_search=true;
     run_experiment(inner_local_search);
 
     return 0;

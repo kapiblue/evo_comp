@@ -28,6 +28,7 @@ namespace N
         void write_best_to_csv(std::string filename);
         int get_best_solution_eval();
         std::vector<int> get_best_solution();
+        std::vector<int> greedy_cycle_repair();
         Solution get_best_full_solution();
         Solution *get_best_solution_addr();
 

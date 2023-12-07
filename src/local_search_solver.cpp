@@ -1,5 +1,6 @@
 #include "local_search_solver.h"
 #include "solution.h"
+#include "utils.h"
 
 #include <string>
 #include <cstdlib>
@@ -301,22 +302,102 @@ void LocalSearchSolver::perturb_best_solution(int n)
 
 void LocalSearchSolver::destroy_and_repair_best_solution()
 {
-    int edge1 = 0;
-    int edge2 = 0;
-    while (abs(edge1 - edge2) < 2)
-    {
-        edge1 = rand() % 100;
-        edge2 = rand() % 100;
+    // destroy
 
-        if (edge1 > edge2)
+    int destroy_sequences_amount = (rand() % 4) + 2;
+    int length = this->best_solution.get_number_of_nodes() / (4 * destroy_sequences_amount);
+
+    for(int idx=0; idx< destroy_sequences_amount; idx++){
+        int index_f = rand() % (this->best_solution.get_number_of_nodes() - length + 1);
+        this->best_solution.remove_nodes(index_f, length);
+        // cout<<index_f<<endl;
+        // this->best_solution.print();
+    }
+
+    // repair 
+    vector<int> tmp_sol = this->greedy_cycle_repair();
+    
+
+    this->best_solution.set_nodes(tmp_sol);
+    
+    // aktualizacja ewaluacji (nie ma na celu zmiany rozwiązania)
+    this->set_initial_solution(&this->best_solution);
+}
+
+vector<int> LocalSearchSolver::greedy_cycle_repair(){
+
+    vector<vector<int>> edges;
+    vector<int> nodes = this->best_solution.get_nodes();
+    for(int idx=0;idx<this->best_solution.get_number_of_nodes()-1;idx++){
+        edges.push_back(vector<int>{nodes[idx], nodes[idx+1]});
+    }
+    edges.push_back(vector<int>{nodes[this->best_solution.get_number_of_nodes()-1], nodes[0]});
+    
+
+    while (this->best_solution.get_number_of_nodes() < n_nodes)
+    {
+        int node_to_add_idx = -1;
+        int edge_to_remove_idx = -1;
+        int min_total_cost = numeric_limits<int>::max();
+
+        for (int node_idx = 0; node_idx < this->dist_mat.size(); node_idx++)
         {
-            swap(edge1, edge2);
+
+            if (!contain(this->best_solution.get_nodes(), node_idx))
+            {
+
+                for (int edge_idx = 0; edge_idx < edges.size(); edge_idx++)
+                {
+
+                    int node1 = edges[edge_idx][0];
+                    int node2 = edges[edge_idx][1];
+
+                    int total_cost = this->dist_mat[node1][node_idx] +
+                                     this->dist_mat[node2][node_idx] -
+                                     this->dist_mat[node1][node2] + this->costs[node_idx];
+
+                    if (total_cost < min_total_cost)
+                    {
+
+                        min_total_cost = total_cost;
+                        edge_to_remove_idx = edge_idx;
+                        node_to_add_idx = node_idx;
+                    }
+                }
+            }
+        }
+
+        int node_to_connect_1 = edges[edge_to_remove_idx][0];
+        int node_to_connect_2 = edges[edge_to_remove_idx][1];
+
+        edges.erase(edges.begin() + edge_to_remove_idx);
+        edges.push_back(vector<int>{node_to_connect_1, node_to_add_idx});
+        edges.push_back(vector<int>{node_to_connect_2, node_to_add_idx});
+
+        this->best_solution.add_node(node_to_add_idx);
+    }
+
+    vector<int> correct_order_nodes;
+    correct_order_nodes.push_back(edges[0][0]);
+    while (edges.size() > 1)
+    {
+        for (int i = 0; i < edges.size(); i++)
+        {
+            if (edges[i][0] == correct_order_nodes.back())
+            {
+                correct_order_nodes.push_back(edges[i][1]);
+                edges.erase(edges.begin() + i);
+                // continue;
+            }
+            else if (edges[i][1] == correct_order_nodes.back())
+            {
+                correct_order_nodes.push_back(edges[i][0]);
+                edges.erase(edges.begin() + i);
+                // continue;
+            }
         }
     }
-    int delta = this->best_solution.calculate_delta_intra_route_edges(&this->dist_mat,
-                                                                      edge1, edge2);
-    this->best_sol_evaluation += delta;
-    this->best_solution.exchange_2_edges(edge1, edge2);
+    return correct_order_nodes;
 }
 
 void LocalSearchSolver::write_best_to_csv(string filename)
