@@ -40,7 +40,8 @@ void run_experiment(bool inner_local_search)
         LSNLocalSearchSolver lsnlss = LSNLocalSearchSolver(instance, 0.5, initial_solution);
         vector<int> best_evaluations;
         vector<double> generation_times;
-
+        Solution best_sol = initial_solution;
+        int best_eval = numeric_limits<int>::max();;
         for (int i = 0; i < rep; i++)
         {
             int generation_time = measure_generation_time(
@@ -49,13 +50,17 @@ void run_experiment(bool inner_local_search)
             generation_times.push_back(generation_time);
             int eval = lsnlss.get_best_solution_eval();
             best_evaluations.push_back(eval);
+            if(eval<best_eval){
+                best_eval = eval;
+                best_sol.set_nodes(lsnlss.get_best_solution());
+            }
         }
         string dir = "lab7/solutions/" + instance.substr(14, 4) + "/";
         string filename = "LSNLS_NO_INNER_LOCAL_SEARCH.csv";
         if(inner_local_search){
             filename = "LSNLS_INNER_LOCAL_SEARCH.csv";
         }
-        lsnlss.write_best_to_csv(dir + filename);
+        best_sol.write_to_csv(dir + filename);
 
         int min_e_ms, max_e_ms;
         double min_t_ms, avg_t_ms, max_t_ms, avg_e_ms;
