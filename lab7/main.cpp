@@ -30,7 +30,7 @@ void run_experiment(bool inner_local_search)
     {
         cout << instance.substr(14, 4) << endl;
         // Convert to microseconds
-        int time_limit = int(time_limits[instance_idx]) * 1000;
+        int time_limit = int(time_limits[instance_idx] * 1000);
         // cout << "time: "<< time_limit << endl;
         ++instance_idx;
 

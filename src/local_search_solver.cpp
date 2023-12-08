@@ -307,32 +307,32 @@ void LocalSearchSolver::destroy_and_repair_best_solution()
     int destroy_sequences_amount = (rand() % 4) + 2;
     int length = this->best_solution.get_number_of_nodes() / (4 * destroy_sequences_amount);
 
-    for(int idx=0; idx< destroy_sequences_amount; idx++){
+    for (int idx = 0; idx < destroy_sequences_amount; idx++)
+    {
         int index_f = rand() % (this->best_solution.get_number_of_nodes() - length + 1);
         this->best_solution.remove_nodes(index_f, length);
         // cout<<index_f<<endl;
         // this->best_solution.print();
     }
-
-    // repair 
-    vector<int> tmp_sol = this->greedy_cycle_repair();
-    
+    // repair
+    vector<int> tmp_sol;
+    this->greedy_cycle_repair(&tmp_sol);
 
     this->best_solution.set_nodes(tmp_sol);
-    
-    // aktualizacja ewaluacji (nie ma na celu zmiany rozwiązania)
-    this->set_initial_solution(&this->best_solution);
+    this->best_solution.update_selected();
+    this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
 }
 
-vector<int> LocalSearchSolver::greedy_cycle_repair(){
+void LocalSearchSolver::greedy_cycle_repair(vector<int> *correct_order_nodes)
+{
 
     vector<vector<int>> edges;
     vector<int> nodes = this->best_solution.get_nodes();
-    for(int idx=0;idx<this->best_solution.get_number_of_nodes()-1;idx++){
-        edges.push_back(vector<int>{nodes[idx], nodes[idx+1]});
+    for (int idx = 0; idx < this->best_solution.get_number_of_nodes() - 1; idx++)
+    {
+        edges.push_back(vector<int>{nodes[idx], nodes[idx + 1]});
     }
-    edges.push_back(vector<int>{nodes[this->best_solution.get_number_of_nodes()-1], nodes[0]});
-    
+    edges.push_back(vector<int>{nodes[this->best_solution.get_number_of_nodes() - 1], nodes[0]});
 
     while (this->best_solution.get_number_of_nodes() < n_nodes)
     {
@@ -343,7 +343,7 @@ vector<int> LocalSearchSolver::greedy_cycle_repair(){
         for (int node_idx = 0; node_idx < this->dist_mat.size(); node_idx++)
         {
 
-            if (!contain(this->best_solution.get_nodes(), node_idx))
+            if (!this->best_solution.contains(node_idx))
             {
 
                 for (int edge_idx = 0; edge_idx < edges.size(); edge_idx++)
@@ -377,27 +377,25 @@ vector<int> LocalSearchSolver::greedy_cycle_repair(){
         this->best_solution.add_node(node_to_add_idx);
     }
 
-    vector<int> correct_order_nodes;
-    correct_order_nodes.push_back(edges[0][0]);
+    (*correct_order_nodes).push_back(edges[0][0]);
     while (edges.size() > 1)
     {
         for (int i = 0; i < edges.size(); i++)
         {
-            if (edges[i][0] == correct_order_nodes.back())
+            if (edges[i][0] == (*correct_order_nodes).back())
             {
-                correct_order_nodes.push_back(edges[i][1]);
+                (*correct_order_nodes).push_back(edges[i][1]);
                 edges.erase(edges.begin() + i);
                 // continue;
             }
-            else if (edges[i][1] == correct_order_nodes.back())
+            else if (edges[i][1] == (*correct_order_nodes).back())
             {
-                correct_order_nodes.push_back(edges[i][0]);
+                (*correct_order_nodes).push_back(edges[i][0]);
                 edges.erase(edges.begin() + i);
                 // continue;
             }
         }
     }
-    return correct_order_nodes;
 }
 
 void LocalSearchSolver::write_best_to_csv(string filename)

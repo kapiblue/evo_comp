@@ -28,9 +28,10 @@ namespace N
         void set_nodes(std::vector<int> nodes);
 
         int get_number_of_nodes();
-        
+
         std::set<int> get_selected();
         void set_selected(std::set<int> new_selected);
+        void update_selected();
 
         int get_node_at_idx(int node_idx);
         int get_next_node_idx(int node_idx);

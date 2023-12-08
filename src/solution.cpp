@@ -18,14 +18,17 @@ void Solution::add_node(int node)
     this->selected.insert(node);
     this->n_nodes += 1;
 }
-void Solution::remove_node(int idx){
+void Solution::remove_node(int idx)
+{
     this->selected.erase(this->nodes[idx]);
     this->nodes.erase(this->nodes.begin() + idx);
     this->n_nodes -= 1;
 }
 
-void Solution::remove_nodes(int idx, int amount){
-    for(int i=0;i<amount;i++){
+void Solution::remove_nodes(int idx, int amount)
+{
+    for (int i = 0; i < amount; i++)
+    {
         this->remove_node(idx);
     }
 }
@@ -38,8 +41,14 @@ bool Solution::contains(int node)
 void Solution::set_nodes(vector<int> nodes)
 {
     // Set nodes
-    this->nodes = nodes;
+    this->nodes.assign(nodes.begin(), nodes.end());
     this->n_nodes = nodes.size();
+}
+
+void Solution::update_selected()
+{
+    this->selected.clear();
+    this->selected = set(this->nodes.begin(), this->nodes.end());
 }
 
 vector<int> Solution::get_nodes()

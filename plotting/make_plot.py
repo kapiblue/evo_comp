@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 instancesPath = "../instance_data/"
-solutionsPath = "../lab6/solutions/"
+solutionsPath = "../lab7/solutions/"
 
 colors = ['red', 'green', 'blue', 'orange', 'violet']
 
@@ -48,4 +48,4 @@ for instancePath in glob(os.path.join(instancesPath, "*.csv")):
 
     fig.tight_layout()
     # Save
-    fig.savefig(f"../lab6/plots/{instanceName}.jpg")
+    fig.savefig(f"../lab7/plots/{instanceName}.jpg")
