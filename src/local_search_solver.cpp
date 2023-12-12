@@ -419,3 +419,15 @@ Solution *LocalSearchSolver::get_best_solution_addr()
 {
     return &this->best_solution;
 }
+
+void LocalSearchSolver::reset()
+{
+    // Set new random solution
+    RandomSolution new_initial_solution = RandomSolution();
+    new_initial_solution.generate(200, 100);
+    this->best_solution= new_initial_solution;
+    this->best_solution.set_nodes(new_initial_solution.get_nodes());
+    this->best_solution.set_selected(new_initial_solution.get_selected());
+
+    this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
+}

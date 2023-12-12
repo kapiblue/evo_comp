@@ -4,6 +4,7 @@
 #include <algorithm> // sort
 #include <chrono>
 #include <iostream>
+#include <fstream>
 
 #include "problem_solver.h"
 #include "local_search_solver.h"
@@ -143,6 +144,27 @@ void print_vector(const std::vector<T> &vec)
         std::cout << i << ' ';
     }
     std::cout << std::endl;
+}
+
+template <typename T>
+void write_matrix_to_csv(std::vector<std::vector<T>> matrix, std::string filename)
+{
+    std::ofstream myfile;
+    myfile.open(filename);
+
+    for (int i = 0; i < matrix.size(); ++i)
+    {
+        for (int j = 0; j < matrix[i].size(); ++j)
+        {
+            myfile << matrix[i][j];
+            if (j < matrix[i].size() - 1)
+            {
+                myfile << ",";
+            }
+        }
+        myfile << std::endl;
+    }
+    myfile.close();
 }
 
 #endif
