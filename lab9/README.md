@@ -9,7 +9,7 @@ Proposed algorithm parameters:
 solution or the value of the objective function).
 Proposed recombination operators:
 - Operator 1. We locate in the offspring all common nodes and edges and fill the rest of the solution at random.
-- Operator 2. We choose one of the parents as the starting solution. We remove from this solution all edges and nodes that are not present in the other parent. The solution is repaired using the heuristic method in the same way as in the LNS method. We also test the version of the algorithm without local search aftern recombination (we still use local search for the initial population).
+- Operator 2. We choose one of the parents as the starting solution. We remove from this solution all edges and nodes that are not present in the other parent. The solution is repaired using the heuristic method in the same way as in the LNS method. We also test the version of the algorithm without local search after recombination (we still use local search for the initial population).
 
 If the algorithm described above would cause premature convergence, it can be modified, e.g. additional diversification preservation mechanisms.
 
@@ -21,5 +21,5 @@ Report – analogous to before.
 In dir "evo_comp" execute:
 
 ```bash
-g++ src/*.cpp lab8/main.cpp -Isrc -o lab8/myprogram -std=c++20 && ./lab8/myprogram
+g++ src/*.cpp lab9/main.cpp -Isrc -o lab9/myprogram -std=c++20 && ./lab9/myprogram
 ```
