@@ -206,3 +206,8 @@ int ProblemSolver::get_total_nodes()
 {
     return this->total_nodes;
 }
+
+int ProblemSolver::get_n_nodes()
+{
+    return this->n_nodes;
+}
