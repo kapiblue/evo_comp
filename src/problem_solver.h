@@ -23,6 +23,7 @@ namespace N
 
     public:
         int get_total_nodes();
+        int get_n_nodes();
 
         ProblemSolver(std::string instance_filename, double fraction_nodes);
         void generate_solutions(std::string method);
