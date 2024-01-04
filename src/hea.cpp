@@ -125,6 +125,7 @@ Solution HEA::operator1(Solution parent1, Solution parent2){
     }
 
     this->solver->set_initial_solution_copy(parent1);
+    this->solver->run_basic("TWO_EDGES", "GREEDY");
 
     return parent1;
 }
