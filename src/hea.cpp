@@ -110,19 +110,20 @@ void HEA::operator1(int parent1_key, int parent2_key)
     Solution parent2 = this->population[parent2_key];
 
     int idx = 0;
+    vector<int> remove_idxs;
     while (idx < parent1.get_nodes().size())
     {
         bool is_part_of_edge = this->is_part_of_any_edge(parent1, parent2, idx);
 
         if (!is_part_of_edge)
         {
-            parent1.remove_node(idx);
+            remove_idxs.insert(remove_idxs.begin(), idx);
         }
-        else
-        {
-            idx++;
-        }
-    } // tutaj usuwamy z parent 1 niepowtarzające się krawędzie a co za tym idzie nody
+        idx++;
+    } 
+    for(int i=0;i<remove_idxs.size();i++){
+        parent1.remove_node(remove_idxs[i]);
+    }
 
     int node_id;
     while (parent1.get_nodes().size() < 100)
@@ -142,19 +143,20 @@ void HEA::operator2(int parent1_key, int parent2_key, bool local_search)
     Solution parent1 = this->population[parent1_key];
     Solution parent2 = this->population[parent2_key];
     int idx = 0;
+    vector<int> remove_idxs;
     while (idx < parent1.get_nodes().size())
     {
         bool is_part_of_edge = this->is_part_of_any_edge(parent1, parent2, idx);
 
         if (!is_part_of_edge)
         {
-            parent1.remove_node(idx);
+            remove_idxs.insert(remove_idxs.begin(), idx);
         }
-        else
-        {
-            idx++;
-        }
-    } // tutaj usuwamy z parent 1 niepowtarzające się krawędzie a co za tym idzie nody
+        idx++;
+    } 
+    for(int i=0;i<remove_idxs.size();i++){
+        parent1.remove_node(remove_idxs[i]);
+    }
 
     vector<int> tmp_sol;
     this->solver->set_initial_solution_copy(parent1);
