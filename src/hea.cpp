@@ -77,14 +77,16 @@ void HEA::run(double time, bool local_search)
         pair<int, int> parent_keys = this->select_parent_keys();
 
         int random_operator = rand() % 2; // tutaj tak ustawiłem bo ten operator 1 w zasadzie nie pomaga wgl
-        if(random_operator==0){
-            Solution tmp_sol = this->operator1(this->population[parent_keys.first],
-                                    this->population[parent_keys.second]); // ten operator dodaje randomowe nody na końcu rozwiązania
-        }else{
-            Solution tmp_sol = this->operator2(this->population[parent_keys.first],
-                                    this->population[parent_keys.second]); // ten operator uzupełnia rozwiązanie heurystyką
+        if (random_operator == 0)
+        {
+            this->operator1(parent_keys.first,
+                                      parent_keys.second); // ten operator dodaje randomowe nody na końcu rozwiązania
         }
-        
+        else
+        {
+            this->operator2(parent_keys.first,
+                                      parent_keys.second, local_search); // ten operator uzupełnia rozwiązanie heurystyką
+        }
 
         // this->population[parent_keys.first].print();
         // this->population[parent_keys.second].print();
@@ -97,21 +99,32 @@ void HEA::run(double time, bool local_search)
             // this->print_population();
             this->population.erase(prev(this->population.end())); // remove the worst solution
             // this->print_population();
-            counter++;
         }
+        counter++;
     }
     this->print_population();
     this->iter_count.push_back(counter);
+    cout << "ITER COUNT " << counter << endl;
 }
 
-Solution HEA::operator1(Solution parent1, Solution parent2){
+void HEA::operator1(int parent1_key, int parent2_key)
+{
+    Solution parent1 = this->population[parent1_key];
+    Solution parent2 = this->population[parent2_key];
 
-    int idx =0;
-    while(idx < parent1.get_nodes().size()){
+    int idx = 0;
+    while (idx < parent1.get_nodes().size())
+    {
         bool is_part_of_edge = this->is_part_of_any_edge(parent1, parent2, idx);
 
-        if(!is_part_of_edge){parent1.remove_node(idx);}
-        else{idx ++;}
+        if (!is_part_of_edge)
+        {
+            parent1.remove_node(idx);
+        }
+        else
+        {
+            idx++;
+        }
     } // tutaj usuwamy z parent 1 niepowtarzające się krawędzie a co za tym idzie nody
 
     int node_id;
@@ -119,25 +132,31 @@ Solution HEA::operator1(Solution parent1, Solution parent2){
     {
         node_id = rand() % 200;
 
-        if(!parent1.contains(node_id)){
+        if (!parent1.contains(node_id))
+        {
             parent1.add_node(node_id);
         }
     }
-
     this->solver->set_initial_solution_copy(parent1);
-    this->solver->run_basic("TWO_EDGES", "GREEDY");
-
-    return parent1;
 }
 
-Solution HEA::operator2(Solution parent1, Solution parent2){
-
-    int idx =0;
-    while(idx < parent1.get_nodes().size()){
+void HEA::operator2(int parent1_key, int parent2_key, bool local_search)
+{
+    Solution parent1 = this->population[parent1_key];
+    Solution parent2 = this->population[parent2_key];
+    int idx = 0;
+    while (idx < parent1.get_nodes().size())
+    {
         bool is_part_of_edge = this->is_part_of_any_edge(parent1, parent2, idx);
 
-        if(!is_part_of_edge){parent1.remove_node(idx);}
-        else{idx ++;}
+        if (!is_part_of_edge)
+        {
+            parent1.remove_node(idx);
+        }
+        else
+        {
+            idx++;
+        }
     } // tutaj usuwamy z parent 1 niepowtarzające się krawędzie a co za tym idzie nody
 
     vector<int> tmp_sol;
@@ -146,46 +165,54 @@ Solution HEA::operator2(Solution parent1, Solution parent2){
 
     parent1.set_nodes(tmp_sol);
     parent1.update_selected();
-    this->solver->set_initial_solution_copy(parent1);
 
-    return parent1;
+    this->solver->set_initial_solution_copy(parent1);
+    if (local_search)
+    {
+        this->solver->run_basic("TWO_EDGES", "GREEDY");
+    }
 }
 
 // sprawdzamy czy wierzchołek o podanym indeksie w rodzicu1 jest częścią pewnej krawędzi
-// występującyj również w rodzicu2, jeżeli nie będziemy chcieli go usunąć 
-bool HEA::is_part_of_any_edge(Solution parent1, Solution parent2, int idx){
-    
+// występującyj również w rodzicu2, jeżeli nie będziemy chcieli go usunąć
+bool HEA::is_part_of_any_edge(Solution parent1, Solution parent2, int idx)
+{
+
     int prev_idx = parent1.get_prev_node_idx(idx);
     int next_idx = parent2.get_next_node_idx(idx);
 
-    if(this->contain_edge(parent1, parent2, prev_idx, idx) ||
-        this->contain_edge(parent1, parent2, idx, next_idx)){
+    if (this->contain_edge(parent1, parent2, prev_idx, idx) ||
+        this->contain_edge(parent1, parent2, idx, next_idx))
+    {
         return true;
     }
     return false;
 }
 
 // sprawdzamy czy krawędź występująca w rodzicu1 (z wierzchołkami o podanych indeksach), występuje również w rodzicu2 na dowolnej pozycji
-bool HEA::contain_edge(Solution parent1, Solution parent2, int begin_edge_idx, int end_edge_idx){
+bool HEA::contain_edge(Solution parent1, Solution parent2, int begin_edge_idx, int end_edge_idx)
+{
     int edge_begin = parent1.get_node_at_idx(begin_edge_idx);
     int edge_end = parent1.get_node_at_idx(end_edge_idx);
 
-    if(parent2.contains(edge_begin) && parent2.contains(edge_end)){
-        for(int idx = 0; idx<parent2.get_nodes().size(); idx++){
+    if (parent2.contains(edge_begin) && parent2.contains(edge_end))
+    {
+        for (int idx = 0; idx < parent2.get_nodes().size(); idx++)
+        {
             int next_idx = parent2.get_next_node_idx(idx);
             int prev_idx = parent2.get_prev_node_idx(idx);
 
-            if(
+            if (
                 (edge_begin == parent2.get_node_at_idx(prev_idx) && edge_end == parent2.get_node_at_idx(idx)) ||
                 (edge_end == parent2.get_node_at_idx(prev_idx) && edge_begin == parent2.get_node_at_idx(idx)) ||
                 (edge_begin == parent2.get_node_at_idx(idx) && edge_end == parent2.get_node_at_idx(next_idx)) ||
-                (edge_end == parent2.get_node_at_idx(idx) && edge_begin == parent2.get_node_at_idx(prev_idx))
-            ){
+                (edge_end == parent2.get_node_at_idx(idx) && edge_begin == parent2.get_node_at_idx(prev_idx)))
+            {
                 return true;
             }
         }
     }
-    
+
     return false;
 }
 
@@ -207,6 +234,7 @@ void HEA::reset()
     this->population.clear();
 }
 
-vector<int> HEA::get_iter_count(){
+vector<int> HEA::get_iter_count()
+{
     return this->iter_count;
 }

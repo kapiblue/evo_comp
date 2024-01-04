@@ -60,6 +60,11 @@ int Solution::get_number_of_nodes()
 {
     return this->n_nodes;
 }
+// More robust than get_nodes()
+int Solution::calculate_number_of_nodes()
+{
+    return this->nodes.size();
+}
 
 set<int> Solution::get_selected()
 {

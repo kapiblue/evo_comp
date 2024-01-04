@@ -22,7 +22,7 @@ void run_experiment()
         int time_limit = int(time_limits[instance_idx] * 1000);
         ++instance_idx;
         HEA hea = HEA(instance, 0.5, 20);
-        hea.run(time_limit, false);
+        hea.run(time_limit, true);
         break;
     }
 }
