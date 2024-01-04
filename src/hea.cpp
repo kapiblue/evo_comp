@@ -76,7 +76,7 @@ void HEA::run(double time, bool local_search)
         // Randomly select parents
         pair<int, int> parent_keys = this->select_parent_keys();
 
-        int random_operator = 1;//rand() % 10; // tutaj tak ustawiłem bo ten operator 1 w zasadzie nie pomaga wgl
+        int random_operator = rand() % 2; // tutaj tak ustawiłem bo ten operator 1 w zasadzie nie pomaga wgl
         if(random_operator==0){
             Solution tmp_sol = this->operator1(this->population[parent_keys.first],
                                     this->population[parent_keys.second]); // ten operator dodaje randomowe nody na końcu rozwiązania
@@ -169,19 +169,22 @@ bool HEA::contain_edge(Solution parent1, Solution parent2, int begin_edge_idx, i
     int edge_begin = parent1.get_node_at_idx(begin_edge_idx);
     int edge_end = parent1.get_node_at_idx(end_edge_idx);
 
-    for(int idx = 0; idx<parent2.get_nodes().size(); idx++){
-        int next_idx = parent2.get_next_node_idx(idx);
-        int prev_idx = parent2.get_prev_node_idx(idx);
+    if(parent2.contains(edge_begin) && parent2.contains(edge_end)){
+        for(int idx = 0; idx<parent2.get_nodes().size(); idx++){
+            int next_idx = parent2.get_next_node_idx(idx);
+            int prev_idx = parent2.get_prev_node_idx(idx);
 
-        if(
-            (edge_begin == parent2.get_node_at_idx(prev_idx) && edge_end == parent2.get_node_at_idx(idx)) ||
-            (edge_end == parent2.get_node_at_idx(prev_idx) && edge_begin == parent2.get_node_at_idx(idx)) ||
-            (edge_begin == parent2.get_node_at_idx(idx) && edge_end == parent2.get_node_at_idx(next_idx)) ||
-            (edge_end == parent2.get_node_at_idx(idx) && edge_begin == parent2.get_node_at_idx(prev_idx))
-        ){
-            return true;
+            if(
+                (edge_begin == parent2.get_node_at_idx(prev_idx) && edge_end == parent2.get_node_at_idx(idx)) ||
+                (edge_end == parent2.get_node_at_idx(prev_idx) && edge_begin == parent2.get_node_at_idx(idx)) ||
+                (edge_begin == parent2.get_node_at_idx(idx) && edge_end == parent2.get_node_at_idx(next_idx)) ||
+                (edge_end == parent2.get_node_at_idx(idx) && edge_begin == parent2.get_node_at_idx(prev_idx))
+            ){
+                return true;
+            }
         }
     }
+    
     return false;
 }
 
