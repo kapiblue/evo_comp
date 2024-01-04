@@ -63,7 +63,6 @@ void HEA::run(double time, bool local_search)
     auto start = std::chrono::steady_clock::now();
     // Initialize population
     this->init_population();
-    this->print_population();
     int counter = 0;
     while (true)
     {
@@ -80,12 +79,12 @@ void HEA::run(double time, bool local_search)
         if (random_operator == 0)
         {
             this->operator1(parent_keys.first,
-                                      parent_keys.second); // ten operator dodaje randomowe nody na końcu rozwiązania
+                            parent_keys.second); // ten operator dodaje randomowe nody na końcu rozwiązania
         }
         else
         {
             this->operator2(parent_keys.first,
-                                      parent_keys.second, local_search); // ten operator uzupełnia rozwiązanie heurystyką
+                            parent_keys.second, local_search); // ten operator uzupełnia rozwiązanie heurystyką
         }
 
         // this->population[parent_keys.first].print();
@@ -102,9 +101,7 @@ void HEA::run(double time, bool local_search)
         }
         counter++;
     }
-    this->print_population();
     this->iter_count.push_back(counter);
-    cout << "ITER COUNT " << counter << endl;
 }
 
 void HEA::operator1(int parent1_key, int parent2_key)
@@ -234,7 +231,17 @@ void HEA::reset()
     this->population.clear();
 }
 
-vector<int> HEA::get_iter_count()
+double HEA::get_mean_iter_count()
 {
-    return this->iter_count;
+    return mean(&this->iter_count);
+}
+
+Solution HEA::get_best_solution()
+{
+    return this->population.begin()->second;
+}
+
+int HEA::get_best_solution_eval()
+{
+    return this->population.begin()->first;
 }

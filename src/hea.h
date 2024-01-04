@@ -33,7 +33,9 @@ namespace N
         bool contain_edge(Solution parent1, Solution parent2, int idx_1, int idx_2);
         bool is_part_of_any_edge(Solution parent1, Solution parent2, int idx);
         void reset();
-        std::vector<int> get_iter_count();
+        double get_mean_iter_count();
+        Solution get_best_solution();
+        int get_best_solution_eval();
     };
 
 }
