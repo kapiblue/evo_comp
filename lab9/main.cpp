@@ -74,7 +74,7 @@ int main()
 
     cout << endl
          << "WITH LOCAL SEARCH" << endl;
-    bool inner_local_search = true;
+    inner_local_search = true;
     run_experiment(inner_local_search);
 
     return 0;
