@@ -53,7 +53,9 @@ void run_experiment(bool local_search, int rep = 20)
         calculate_stats(&generation_times, &min_t_ms, &avg_t_ms, &max_t_ms);
         // Watch out, this is in milliseconds!
         cout << "TIME HEA " << avg_t_ms / 1000 << " (" << min_t_ms / 1000 << "-" << max_t_ms / 1000 << ")" << endl;
-        cout << "ITERATIONS " << hea.get_mean_iter_count() << endl;
+        cout << "MEAN ITERATIONS " << hea.get_mean_iter_count() << endl;
+        cout << "MEAN UPDATES " << hea.get_mean_update_count() << endl;
+         cout << "MEAN POPULATION RANGE " << hea.get_mean_pop_range() << endl;
         string dir = "lab9/solutions/" + instance.substr(14, 4) + "/";
         string filename = "HEA_NO_LS.csv";
         if (local_search)
@@ -72,7 +74,7 @@ int main()
 
     cout << endl
          << "WITH LOCAL SEARCH" << endl;
-    inner_local_search = true;
+    bool inner_local_search = true;
     run_experiment(inner_local_search);
 
     return 0;

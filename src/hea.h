@@ -19,6 +19,9 @@ namespace N
         std::map<int, Solution> population;
         int population_size;
         std::vector<int> iter_count;
+        std::vector<int> update_count;
+        // Strore eval_worst - eval_best from the population
+        std::vector<int> pop_eval_range;
 
     public:
         HEA(std::string instance_filename,
@@ -34,6 +37,8 @@ namespace N
         bool is_part_of_any_edge(Solution parent1, Solution parent2, int idx);
         void reset();
         double get_mean_iter_count();
+        double get_mean_update_count();
+        double get_mean_pop_range();
         Solution get_best_solution();
         int get_best_solution_eval();
     };
