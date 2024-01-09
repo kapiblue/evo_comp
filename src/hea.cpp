@@ -63,8 +63,8 @@ void HEA::run(double time, bool local_search)
     auto start = std::chrono::steady_clock::now();
     // Initialize population
     this->init_population();
-    this->print_population();
-    int counter = 0;
+    int iter_counter = 0;
+    int update_counter = 0;
     while (true)
     {
         auto end = std::chrono::steady_clock::now();
@@ -80,31 +80,38 @@ void HEA::run(double time, bool local_search)
         if (random_operator == 0)
         {
             this->operator1(parent_keys.first,
-                                      parent_keys.second); // ten operator dodaje randomowe nody na końcu rozwiązania
+                            parent_keys.second); // ten operator dodaje randomowe nody na końcu rozwiązania
         }
         else
         {
             this->operator2(parent_keys.first,
-                                      parent_keys.second, local_search); // ten operator uzupełnia rozwiązanie heurystyką
+                            parent_keys.second, local_search); // ten operator uzupełnia rozwiązanie heurystyką
         }
 
         // this->population[parent_keys.first].print();
         // this->population[parent_keys.second].print();
         // tmp_sol.print();
+        if (local_search)
+        {
+            this->solver->run_basic("TWO_EDGES", "GREEDY");
+        }
 
         int new_solution_eval = this->solver->get_best_solution_eval();
         if (!this->population.contains(new_solution_eval))
         {
-            this->population[new_solution_eval] = this->solver->get_best_full_solution();
-            // this->print_population();
-            this->population.erase(prev(this->population.end())); // remove the worst solution
-            // this->print_population();
+            // Check if the new solution is better than the worse one
+            if (new_solution_eval < this->population.end()->first)
+            {
+                this->population[new_solution_eval] = this->solver->get_best_full_solution();
+                this->population.erase(prev(this->population.end())); // remove the worst solution
+                update_counter++;
+            }
         }
-        counter++;
+        iter_counter++;
     }
-    this->print_population();
-    this->iter_count.push_back(counter);
-    cout << "ITER COUNT " << counter << endl;
+    this->iter_count.push_back(iter_counter);
+    this->update_count.push_back(update_counter);
+    this->pop_eval_range.push_back(prev(this->population.end())->first - this->population.begin()->first);
 }
 
 void HEA::operator1(int parent1_key, int parent2_key)
@@ -123,8 +130,9 @@ void HEA::operator1(int parent1_key, int parent2_key)
             remove_idxs.insert(remove_idxs.begin(), idx);
         }
         idx++;
-    } 
-    for(int i=0;i<remove_idxs.size();i++){
+    }
+    for (int i = 0; i < remove_idxs.size(); i++)
+    {
         parent1.remove_node(remove_idxs[i]);
     }
 
@@ -157,8 +165,9 @@ void HEA::operator2(int parent1_key, int parent2_key, bool local_search)
             remove_idxs.insert(remove_idxs.begin(), idx);
         }
         idx++;
-    } 
-    for(int i=0;i<remove_idxs.size();i++){
+    }
+    for (int i = 0; i < remove_idxs.size(); i++)
+    {
         parent1.remove_node(remove_idxs[i]);
     }
 
@@ -170,10 +179,6 @@ void HEA::operator2(int parent1_key, int parent2_key, bool local_search)
     parent1.update_selected();
 
     this->solver->set_initial_solution_copy(parent1);
-    // if (local_search)
-    // {
-    //     this->solver->run_basic("TWO_EDGES", "GREEDY");
-    // }
 }
 
 // sprawdzamy czy wierzchołek o podanym indeksie w rodzicu1 jest częścią pewnej krawędzi
@@ -237,7 +242,24 @@ void HEA::reset()
     this->population.clear();
 }
 
-vector<int> HEA::get_iter_count()
+double HEA::get_mean_iter_count()
 {
-    return this->iter_count;
+    return mean(&this->iter_count);
+}
+double HEA::get_mean_update_count()
+{
+    return mean(&this->update_count);
+}
+double HEA::get_mean_pop_range()
+{
+    return mean(&this->pop_eval_range);
+}
+Solution HEA::get_best_solution()
+{
+    return this->population.begin()->second;
+}
+
+int HEA::get_best_solution_eval()
+{
+    return this->population.begin()->first;
 }
