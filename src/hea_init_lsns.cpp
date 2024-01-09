@@ -1,4 +1,4 @@
-#include "hea.h"
+#include "hea_init_lsns.h"
 #include "local_search_solver.h"
 #include "solution.h"
 #include "random_solution.h"
@@ -11,7 +11,7 @@
 using namespace std;
 using namespace N;
 
-HEA::HEA(string instance_filename,
+HEA_INIT_LSNS::HEA_INIT_LSNS(string instance_filename,
          double fraction_nodes,
          int population_size)
 {
@@ -23,7 +23,7 @@ HEA::HEA(string instance_filename,
     this->population_size = population_size;
 }
 
-void HEA::init_population()
+void HEA_INIT_LSNS::init_population()
 {
     int total_nodes = this->solver->get_total_nodes();
     int n_nodes = this->solver->get_n_nodes();
@@ -45,7 +45,7 @@ void HEA::init_population()
     }
 }
 
-void HEA::print_population()
+void HEA_INIT_LSNS::print_population()
 {
     cout << "POPULATION" << endl;
     int i = 0;
@@ -57,7 +57,7 @@ void HEA::print_population()
     }
 }
 
-void HEA::run(double time, bool local_search)
+void HEA_INIT_LSNS::run(double time, bool local_search)
 {
 
     auto start = std::chrono::steady_clock::now();
@@ -107,7 +107,7 @@ void HEA::run(double time, bool local_search)
     cout << "ITER COUNT " << counter << endl;
 }
 
-void HEA::operator1(int parent1_key, int parent2_key)
+void HEA_INIT_LSNS::operator1(int parent1_key, int parent2_key)
 {
     Solution parent1 = this->population[parent1_key];
     Solution parent2 = this->population[parent2_key];
@@ -142,7 +142,7 @@ void HEA::operator1(int parent1_key, int parent2_key)
     this->solver->run_basic("TWO_EDGES", "GREEDY");
 }
 
-void HEA::operator2(int parent1_key, int parent2_key, bool local_search)
+void HEA_INIT_LSNS::operator2(int parent1_key, int parent2_key, bool local_search)
 {
     Solution parent1 = this->population[parent1_key];
     Solution parent2 = this->population[parent2_key];
@@ -178,7 +178,7 @@ void HEA::operator2(int parent1_key, int parent2_key, bool local_search)
 
 // sprawdzamy czy wierzchołek o podanym indeksie w rodzicu1 jest częścią pewnej krawędzi
 // występującyj również w rodzicu2, jeżeli nie będziemy chcieli go usunąć
-bool HEA::is_part_of_any_edge(Solution parent1, Solution parent2, int idx)
+bool HEA_INIT_LSNS::is_part_of_any_edge(Solution parent1, Solution parent2, int idx)
 {
 
     int prev_idx = parent1.get_prev_node_idx(idx);
@@ -193,7 +193,7 @@ bool HEA::is_part_of_any_edge(Solution parent1, Solution parent2, int idx)
 }
 
 // sprawdzamy czy krawędź występująca w rodzicu1 (z wierzchołkami o podanych indeksach), występuje również w rodzicu2 na dowolnej pozycji
-bool HEA::contain_edge(Solution parent1, Solution parent2, int begin_edge_idx, int end_edge_idx)
+bool HEA_INIT_LSNS::contain_edge(Solution parent1, Solution parent2, int begin_edge_idx, int end_edge_idx)
 {
     int edge_begin = parent1.get_node_at_idx(begin_edge_idx);
     int edge_end = parent1.get_node_at_idx(end_edge_idx);
@@ -219,7 +219,7 @@ bool HEA::contain_edge(Solution parent1, Solution parent2, int begin_edge_idx, i
     return false;
 }
 
-pair<int, int> HEA::select_parent_keys()
+pair<int, int> HEA_INIT_LSNS::select_parent_keys()
 {
     int population_size = this->population.size();
     int first_parent_idx = rand() % population_size;
@@ -232,12 +232,12 @@ pair<int, int> HEA::select_parent_keys()
                      next(this->population.begin(), second_parent_idx)->first);
 }
 
-void HEA::reset()
+void HEA_INIT_LSNS::reset()
 {
     this->population.clear();
 }
 
-vector<int> HEA::get_iter_count()
+vector<int> HEA_INIT_LSNS::get_iter_count()
 {
     return this->iter_count;
 }
