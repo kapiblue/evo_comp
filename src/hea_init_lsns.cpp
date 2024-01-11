@@ -1,5 +1,6 @@
-#include "hea.h"
+#include "hea_init_lsns.h"
 #include "local_search_solver.h"
+#include "lsn_local_search_solver.h"
 #include "solution.h"
 #include "random_solution.h"
 #include "utils.h"
@@ -11,7 +12,7 @@
 using namespace std;
 using namespace N;
 
-HEA::HEA(string instance_filename,
+HEA_INIT_LSNS::HEA_INIT_LSNS(string instance_filename,
          double fraction_nodes,
          int population_size)
 {
@@ -20,10 +21,11 @@ HEA::HEA(string instance_filename,
     this->solver = new LocalSearchSolver(instance_filename,
                                          fraction_nodes,
                                          initial_solution);
+    this->instance_filename = instance_filename;
     this->population_size = population_size;
 }
 
-void HEA::init_population()
+void HEA_INIT_LSNS::init_population(double time)
 {
     int total_nodes = this->solver->get_total_nodes();
     int n_nodes = this->solver->get_n_nodes();
@@ -31,21 +33,24 @@ void HEA::init_population()
     while (counter < this->population_size)
     {
         // Generate a random solution
-        RandomSolution new_solution = RandomSolution();
-        new_solution.generate(total_nodes, n_nodes);
+        RandomSolution initial_solution = RandomSolution();
+        initial_solution.generate(200, 100);
+
+        LSNLocalSearchSolver lsnlss = LSNLocalSearchSolver(this->instance_filename, 0.5, initial_solution);
+        lsnlss.run(time/this->population_size, true);
         // Run greedy local search on the solution
-        this->solver->set_initial_solution_copy(new_solution);
-        this->solver->run_basic("TWO_EDGES", "GREEDY");
-        int new_solution_eval = this->solver->get_best_solution_eval();
+
+        int new_solution_eval = lsnlss.get_best_solution_eval();
+
         if (!this->population.contains(new_solution_eval))
         {
-            this->population[new_solution_eval] = this->solver->get_best_full_solution();
+            this->population[new_solution_eval] = lsnlss.get_best_full_solution();
             counter++;
         }
     }
 }
 
-void HEA::print_population()
+void HEA_INIT_LSNS::print_population()
 {
     cout << "POPULATION" << endl;
     int i = 0;
@@ -57,12 +62,12 @@ void HEA::print_population()
     }
 }
 
-void HEA::run(double time, bool local_search)
+void HEA_INIT_LSNS::run(double time, bool local_search)
 {
 
     auto start = std::chrono::steady_clock::now();
     // Initialize population
-    this->init_population();
+    this->init_population(time/2);
     int iter_counter = 0;
     int update_counter = 0;
     while (true)
@@ -97,10 +102,11 @@ void HEA::run(double time, bool local_search)
         }
 
         int new_solution_eval = this->solver->get_best_solution_eval();
+
         if (!this->population.contains(new_solution_eval))
-        {
+        {   
             // Check if the new solution is better than the worse one
-            if (new_solution_eval < this->population.end()->first)
+            if (new_solution_eval < this->population.rbegin()->first)
             {
                 this->population[new_solution_eval] = this->solver->get_best_full_solution();
                 this->population.erase(prev(this->population.end())); // remove the worst solution
@@ -114,7 +120,7 @@ void HEA::run(double time, bool local_search)
     this->pop_eval_range.push_back(prev(this->population.end())->first - this->population.begin()->first);
 }
 
-void HEA::operator1(int parent1_key, int parent2_key)
+void HEA_INIT_LSNS::operator1(int parent1_key, int parent2_key)
 {
     Solution parent1 = this->population[parent1_key];
     Solution parent2 = this->population[parent2_key];
@@ -150,7 +156,7 @@ void HEA::operator1(int parent1_key, int parent2_key)
     this->solver->run_basic("TWO_EDGES", "GREEDY");
 }
 
-void HEA::operator2(int parent1_key, int parent2_key, bool local_search)
+void HEA_INIT_LSNS::operator2(int parent1_key, int parent2_key, bool local_search)
 {
     Solution parent1 = this->population[parent1_key];
     Solution parent2 = this->population[parent2_key];
@@ -183,7 +189,7 @@ void HEA::operator2(int parent1_key, int parent2_key, bool local_search)
 
 // sprawdzamy czy wierzchołek o podanym indeksie w rodzicu1 jest częścią pewnej krawędzi
 // występującyj również w rodzicu2, jeżeli nie będziemy chcieli go usunąć
-bool HEA::is_part_of_any_edge(Solution parent1, Solution parent2, int idx)
+bool HEA_INIT_LSNS::is_part_of_any_edge(Solution parent1, Solution parent2, int idx)
 {
 
     int prev_idx = parent1.get_prev_node_idx(idx);
@@ -198,7 +204,7 @@ bool HEA::is_part_of_any_edge(Solution parent1, Solution parent2, int idx)
 }
 
 // sprawdzamy czy krawędź występująca w rodzicu1 (z wierzchołkami o podanych indeksach), występuje również w rodzicu2 na dowolnej pozycji
-bool HEA::contain_edge(Solution parent1, Solution parent2, int begin_edge_idx, int end_edge_idx)
+bool HEA_INIT_LSNS::contain_edge(Solution parent1, Solution parent2, int begin_edge_idx, int end_edge_idx)
 {
     int edge_begin = parent1.get_node_at_idx(begin_edge_idx);
     int edge_end = parent1.get_node_at_idx(end_edge_idx);
@@ -224,7 +230,7 @@ bool HEA::contain_edge(Solution parent1, Solution parent2, int begin_edge_idx, i
     return false;
 }
 
-pair<int, int> HEA::select_parent_keys()
+pair<int, int> HEA_INIT_LSNS::select_parent_keys()
 {
     int population_size = this->population.size();
     int first_parent_idx = rand() % population_size;
@@ -237,29 +243,29 @@ pair<int, int> HEA::select_parent_keys()
                      next(this->population.begin(), second_parent_idx)->first);
 }
 
-void HEA::reset()
+void HEA_INIT_LSNS::reset()
 {
     this->population.clear();
 }
 
-double HEA::get_mean_iter_count()
+double HEA_INIT_LSNS::get_mean_iter_count()
 {
     return mean(&this->iter_count);
 }
-double HEA::get_mean_update_count()
+double HEA_INIT_LSNS::get_mean_update_count()
 {
     return mean(&this->update_count);
 }
-double HEA::get_mean_pop_range()
+double HEA_INIT_LSNS::get_mean_pop_range()
 {
     return mean(&this->pop_eval_range);
 }
-Solution HEA::get_best_solution()
+Solution HEA_INIT_LSNS::get_best_solution()
 {
     return this->population.begin()->second;
 }
 
-int HEA::get_best_solution_eval()
+int HEA_INIT_LSNS::get_best_solution_eval()
 {
     return this->population.begin()->first;
 }
