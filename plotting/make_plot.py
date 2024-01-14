@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 instancesPath = "../instance_data/"
-solutionsPath = "../lab9/solutions/"
+solutionsPath = "../lab10/solutions/"
 
 colors = ['red', 'green', 'blue', 'orange', 'violet']
 
@@ -31,10 +31,11 @@ for instancePath in glob(os.path.join(instancesPath, "*.csv")):
         print(np.array2string(tmp1, separator=','))
     
     # Make plots
-    fig, axs = plt.subplots(1, 2, figsize=(len(solutionNames)*6, len(solutionNames)*3), dpi = 300)
+    fig, ax = plt.subplots(1, 1, figsize=(len(solutionNames)*6, len(solutionNames)*6), dpi = 300)
     fig.suptitle(instanceName, fontsize=20)
     
-    for i, ax in enumerate(axs.flat):
+    axs = [ax]
+    for i, ax in enumerate(axs):
         # Plot coords
         ax.scatter(xs, ys, s=costs/10)
         # Plot edges
@@ -48,4 +49,4 @@ for instancePath in glob(os.path.join(instancesPath, "*.csv")):
 
     fig.tight_layout()
     # Save
-    fig.savefig(f"../lab9/plots/{instanceName}.pdf")
+    fig.savefig(f"../lab10/plots/{instanceName}.pdf")

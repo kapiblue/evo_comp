@@ -35,6 +35,7 @@ namespace N
 
         void perturb_best_solution(int n);
         void destroy_and_repair_best_solution();
+        void destroy_and_repair_best_solution_v2();
 
         void run_basic(std::string neigh_method, std::string search_method);
 

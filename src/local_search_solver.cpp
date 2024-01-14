@@ -323,6 +323,28 @@ void LocalSearchSolver::destroy_and_repair_best_solution()
     this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
 }
 
+void LocalSearchSolver::destroy_and_repair_best_solution_v2()
+{
+    // destroy
+    int destroy_sequences_amount = (rand() % 3) + 2;
+    int length = this->best_solution.get_number_of_nodes() / (4 * destroy_sequences_amount);
+
+    for (int idx = 0; idx < destroy_sequences_amount; idx++)
+    {
+        int index_f = rand() % (this->best_solution.get_number_of_nodes() - length + 1);
+        this->best_solution.remove_nodes(index_f, length);
+        // cout<<index_f<<endl;
+        // this->best_solution.print();
+    }
+    // repair
+    vector<int> tmp_sol;
+    this->greedy_cycle_repair(&tmp_sol);
+
+    this->best_solution.set_nodes(tmp_sol);
+    this->best_solution.update_selected();
+    this->best_sol_evaluation = this->best_solution.evaluate(&this->dist_mat, &this->costs);
+}
+
 void LocalSearchSolver::greedy_cycle_repair(vector<int> *correct_order_nodes)
 {
 

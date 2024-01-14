@@ -57,11 +57,7 @@ void run_experiment(bool local_search, int rep = 20)
         cout << "MEAN UPDATES " << hea.get_mean_update_count() << endl;
          cout << "MEAN POPULATION RANGE " << hea.get_mean_pop_range() << endl;
         string dir = "lab10/solutions/" + instance.substr(14, 4) + "/";
-        string filename = "HEA_NO_LS.csv";
-        if (local_search)
-        {
-            filename = "HEA_LS.csv";
-        }
+        string filename = "HEA_LSNS_INIT.csv";
         best_sol.write_to_csv(dir + filename);
     }
 }

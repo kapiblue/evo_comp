@@ -29,14 +29,12 @@ void HEA_INIT_LSNS::init_population(double time)
 {
     int total_nodes = this->solver->get_total_nodes();
     int n_nodes = this->solver->get_n_nodes();
+    RandomSolution initial_solution = RandomSolution();
+    initial_solution.generate(total_nodes, n_nodes);
+    LSNLocalSearchSolver lsnlss = LSNLocalSearchSolver(this->instance_filename, 0.5, initial_solution);
     int counter = 0;
     while (counter < this->population_size)
     {
-        // Generate a random solution
-        RandomSolution initial_solution = RandomSolution();
-        initial_solution.generate(200, 100);
-
-        LSNLocalSearchSolver lsnlss = LSNLocalSearchSolver(this->instance_filename, 0.5, initial_solution);
         lsnlss.run(time/this->population_size, true);
         // Run greedy local search on the solution
 
@@ -67,7 +65,9 @@ void HEA_INIT_LSNS::run(double time, bool local_search)
 
     auto start = std::chrono::steady_clock::now();
     // Initialize population
-    this->init_population(time/2);
+    // Half of the time is devoted to searching
+    // for the initial solutions
+    this->init_population(time/3*2);
     int iter_counter = 0;
     int update_counter = 0;
     while (true)
@@ -153,7 +153,6 @@ void HEA_INIT_LSNS::operator1(int parent1_key, int parent2_key)
         }
     }
     this->solver->set_initial_solution_copy(parent1);
-    this->solver->run_basic("TWO_EDGES", "GREEDY");
 }
 
 void HEA_INIT_LSNS::operator2(int parent1_key, int parent2_key, bool local_search)

@@ -21,5 +21,5 @@ Report – analogous to before.
 In dir "evo_comp" execute:
 
 ```bash
-g++ src/*.cpp lab9/main.cpp -Isrc -o lab9/myprogram -std=c++20 && ./lab9/myprogram
+g++ src/*.cpp lab10/main.cpp -Isrc -o lab10/myprogram -std=c++20 && ./lab10/myprogram
 ```
